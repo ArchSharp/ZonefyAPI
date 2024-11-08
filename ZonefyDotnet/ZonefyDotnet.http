@@ -1,0 +1,6 @@
+@ZonefyDotnet_HostAddress = http://localhost:5018
+
+GET {{ZonefyDotnet_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

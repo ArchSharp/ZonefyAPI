@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fueldeystorage",
+  "private_key_id": "9c1a2af845cff1a1825e7e2b00ac1c911bafc817",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCWPV7aNc01rcxV\nK+MhM5AEeWAzqY0K+gKzprPMMl/E5DQiY33t0MuPmJEl5HWy4dTYEERfnmM6nY3N\nJq1IghM29+IrMvaZBXGLZFS689W8ifNNvhRlRuhcmho7Ks/PoPUQuf6tXGbNAA8d\nSAO8coXeGWtF+3YMi/++160ZM/n8QT6lSJO4JtnaDWYGZl8loOVN81C0TqkABCdk\n45oZ00NEFESXG/Efk8zWESSpzOjs6jzae7t3hOAfHcojUJINbiD5HVxLJRxy+0S2\nRdoZR3zqRwwXAK5eVIk7uT6fCAgB+Hw87tTfu0t//nNNL0Ss4iI+ScTB1ol45h4e\nsHknSXGTAgMBAAECggEACrEjZvQdPoy31ffhmiNJRIg+yG5wky9nsdFTSlzrY9+5\nthjOhXYuhnGdIs03cxuPQjEmLIfhF/LOfKMcAeT/6RGLDvf5hLpWck0ZmpRvyZMn\ntYipeuuo7a4p37wUPfp+dkpGTaAd0MkISlUtruOXk07Ly5cxt4LfGH3Q29JPIByI\nlBypnKAdZ0+/Db9CDRK7JwHWmDBPtTqkZ/TwXyEo55955d3tOYsb2UYZLvWjrksR\nabzT4LJri3pN0t33zlEfO18dRrJlpMX0fyGJh2UQAYi3/a1ZFWiMriLKYXBhs+7m\nAYUaRUL9QvQc8d6/glK14yK5Dfj9M1BfzS7LlJRKgQKBgQDS1OdmNO7iJ+ARPxeB\nGUzaOA+eGeMsQZxmhuZFcat20twUfoutluyMU0vsniooDnN78XQyTqURwRh5P3Jd\nIwRRo9E3F+0T2brz7JNVLTUgc0MxDNcGrmJTV1JUag6XD6+/WZhMyn8OxmxXUCJo\n/Tm/hqSGVfafn0+5eDEz/xFNuQKBgQC2bUrogH08OnT+2dfhUsMgETl0k+Sv0LgF\nObB4AFUGXI98pYbfcj2R8cICosDoLEEy0Ik0G8tf09HecCypC0ulXwxwaF5v1aaO\n3K/ZLgPnTNInF+vPDkPFHRN0u6ECDeo5IfW4QUvoFwZ6geWzqyUUrKJhEp+hKTL7\n1m/cBmo/qwKBgGgAgJnJmOHVO9ImJmkX2vJ23zVlncvyHb3x49vz49p8z/YIKs0Z\n+1yJppV1vGQAJPXKOUCrzQACGhmNs9O/91xyjD06P0ggivnTBSbqYx+73DRxGg2A\nrp5gIAvmOYZJRbAF+XxAFAds2HsF28OgzwDs4XInK764LvLWGKeGtrl5AoGAfWIY\n/jxx1xeGmjM4AZJUspGkH9AWehDGqjDAbXos9jZgGJfcX2+xicHUSuN6GxlvpnFW\nHA6OdcqskGohB/7Pe1YcwpW5crwxwjdEVc0eubc/KcdzN9jiE3Ssjqr3OuY9eg8x\nR/b5KQfKWCE3s4mJ7u/Im1elh6s9c4IrV9rA5AkCgYBOS8A2E+6duqmBQIoyVh8G\nmmVcOB0gWvQ6p3tWl1GRPn9pB5s7JJ2qn2r8yrF3S4LeIMoDZLXEKyh2PqQYW51o\nCYUCZ8uC36HX3VMA6L+mhxQRsxLnwPDyugxV5t/BTEIYutVohEv2TOTytBkAQ5U5\nHPbUwKPAGSVEPisH64NyCQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "fueldeyimagestorage@fueldeystorage.iam.gserviceaccount.com",
+  "client_id": "105049116424301619769",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fueldeyimagestorage%40fueldeystorage.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
