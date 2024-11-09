@@ -1,0 +1,54 @@
+name: Build and Deploy .NET Docker Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushing to the 'main' branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0'  # Specify the .NET version
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build the project
+      run: dotnet build --configuration Release
+
+    - name: Publish the project
+      run: dotnet publish --configuration Release --output ./out
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and push Docker image
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        docker build -t archraphr/zonefyapi:latest .
+        # docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        docker push archraphr/zonefyapi:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Make sure deployment runs after the build job finishes
+
+    steps:
+    - name: SSH to DigitalOcean and deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no root@your_droplet_ip << 'EOF'
+          docker pull archraphr/zonefyapi:latest
+          docker stop zonefyapi || true
+          docker rm zonefyapi || true
+          docker run -d -p 80:80 --name zonefyapi archraphr/zonefyapi:latest
+        EOF
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
