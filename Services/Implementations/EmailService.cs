@@ -99,14 +99,22 @@ namespace ZonefyDotnet.Services.Implementations
 
         private string LoadTemplate(string emailTemplate)
         {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
+            //string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            //string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
 
-            string templateDir = Path.Combine(upThreeLevels, "Files/MailTemplates");
+            //string templateDir = Path.Combine(upThreeLevels, "Files/MailTemplates");
+            //string templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
+
+            //using FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            //using StreamReader streamReader = new StreamReader(fileStream, Encoding.Default);
+
+            // Access the template directly from the /app/Files path
+            string templateDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files/MailTemplates");
             string templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
 
             using FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using StreamReader streamReader = new StreamReader(fileStream, Encoding.Default);
+
 
             string mailTemplate = streamReader.ReadToEnd();
             streamReader.Close();
@@ -116,10 +124,15 @@ namespace ZonefyDotnet.Services.Implementations
 
         public string ImageCID(string imageName, string extension)
         {
+            //string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            //string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
+            //string templateDir = Path.Combine(upThreeLevels, "Files\\Images");
+            //string filePath = Path.Combine(templateDir, $"{imageName}.{extension}");
+
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
-            string templateDir = Path.Combine(upThreeLevels, "Files\\Images");
+            string templateDir = Path.Combine(baseDir, "Files", "Images"); // No need for upThreeLevels in Docker
             string filePath = Path.Combine(templateDir, $"{imageName}.{extension}");
+
 
             //Console.WriteLine("tPath: ",filePath);
 
