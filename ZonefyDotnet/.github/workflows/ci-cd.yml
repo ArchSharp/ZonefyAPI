@@ -34,21 +34,25 @@ jobs:
       run: |
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
         docker build -t archraphr/zonefyapi:latest .
-        # docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
         docker push archraphr/zonefyapi:latest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build  # Make sure deployment runs after the build job finishes
 
     steps:
-    - name: SSH to DigitalOcean and deploy
+    - name: Login to docker hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Clean Up Docker Resources
       run: |
-        ssh -o StrictHostKeyChecking=no root@your_droplet_ip << 'EOF'
-          docker pull archraphr/zonefyapi:latest
-          docker stop zonefyapi || true
-          docker rm zonefyapi || true
-          docker run -d -p 80:80 --name zonefyapi archraphr/zonefyapi:latest
-        EOF
+          docker system prune -a -f
+          docker volume prune -f
+          sudo rm -rf /var/lib/docker/tmp/*
+    - name: Pull docker image
+      run: docker pull archraphr/zonefyapi:latest
+    - name: Delete old container
+      run: docker rm -f zonefy-container
+    - name: Run docker container
+      run: docker run -d -p 5018:8080 --name zonefy-container archraphr/zonefyapi
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
