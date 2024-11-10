@@ -102,7 +102,7 @@ namespace ZonefyDotnet.Services.Implementations
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
 
-            string templateDir = Path.Combine(upThreeLevels, "ZonefyDotnet/Files/MailTemplates");
+            string templateDir = Path.Combine(upThreeLevels, "Files/MailTemplates");
             string templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
 
             using FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -118,7 +118,7 @@ namespace ZonefyDotnet.Services.Implementations
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
-            string templateDir = Path.Combine(upThreeLevels, "ZonefyDotnet\\Files\\Images");
+            string templateDir = Path.Combine(upThreeLevels, "Files\\Images");
             string filePath = Path.Combine(templateDir, $"{imageName}.{extension}");
 
             //Console.WriteLine("tPath: ",filePath);
