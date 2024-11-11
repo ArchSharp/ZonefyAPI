@@ -1,21 +1,11 @@
-using Application.Helpers;
-using Application.Services.Implementations.RabbitMQMessageBrokerService;
-using Application.Services.MessageBrokerConfig;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Domain.Entities.Configurations;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using ZonefyDotnet.Configurations;
-using ZonefyDotnet.Database;
 using ZonefyDotnet.DI;
 using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Middlewares;
-using ZonefyDotnet.Repositories.Implementations;
-using ZonefyDotnet.Repositories.Interfaces;
 using ZonefyDotnet.Services.HostedService;
 
 var builder = WebApplication.CreateBuilder(args);
