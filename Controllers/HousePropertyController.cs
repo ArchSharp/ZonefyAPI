@@ -11,8 +11,7 @@ namespace ZonefyDotnet.Controllers
     //[Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/HouseProperty")]
-    [Authorize]
+    [Route("api/HouseProperty")]    
     public class HousePropertyController : ControllerBase
     {
         private readonly IHousePropertyService _propertyService;
@@ -35,6 +34,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpPost()]
         [Route("Create")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<GetHousePropertyDTO>), 201)]
         public async Task<IActionResult> CreateUser(CreateHousePropertyDTO model)
         {
@@ -68,6 +68,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpGet()]
         [Route("GetAllByEmail")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>), 200)]
         public async Task<IActionResult> GetAllHousePropertiesByEmail(string email, int pageNumber)
         {
@@ -84,6 +85,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpPut()]
         [Route("Update")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<GetHousePropertyDTO>), 200)]
         public async Task<IActionResult> UpdateHouseProperty(UpdateHousePropertyDTO model)
         {
@@ -100,6 +102,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpDelete()]
         [Route("Delete")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<string>), 200)]
         public async Task<IActionResult> DeleteHouseProperty(Guid id)
         {
@@ -116,6 +119,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpPost()]
         [Route("UploadImage")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<string>), 200)]
         public async Task<IActionResult> UploadImage(List<IFormFile> files, Guid propertyId)
         {
@@ -134,6 +138,7 @@ namespace ZonefyDotnet.Controllers
         /// <returns></returns>
         [HttpDelete()]
         [Route("DeleteImage")]
+        [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<string>), 200)]
         public async Task<IActionResult> DeleteFileAsync(string fileId, string userEmail, Guid propertyId)
         {
