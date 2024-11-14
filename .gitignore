@@ -362,5 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 zoneefystorage-ee7b59340270.json
-fueldeystorage-9c1a2af845cf.json  
+fueldeystorage-9c1a2af845cf.json.env 
+.env 
  

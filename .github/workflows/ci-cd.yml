@@ -18,6 +18,10 @@ jobs:
       with:
         dotnet-version: '8.0'  # Specify the .NET version
 
+    - name: Create .env file
+      run: |
+          echo "GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON }}" >> .env        
+
     - name: Restore dependencies
       run: dotnet restore
 
