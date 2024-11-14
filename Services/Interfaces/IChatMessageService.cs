@@ -8,7 +8,7 @@ namespace ZonefyDotnet.Services.Interfaces
     {
         Task<SuccessResponse<string>> SendMessage(SendMessageRequestDTO request);
         Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetAllChatMessages(int pageNumber);
-        Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPaginatedChatMessages(string chatIdentifier, int pageNumber);
+        Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPaginatedChatMessages(string sender, string receiver, int pageNumber);
         Task<SuccessResponse<string>> DeleteChatMessages(string chatIdentifier);
         Task<SuccessResponse<string>> DeleteSingleChatMessage(Guid messageId);
     }

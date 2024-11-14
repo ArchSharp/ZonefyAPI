@@ -121,38 +121,21 @@ namespace ZonefyDotnet.Services.Implementations
             };
         }
 
-        public async Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPaginatedChatMessages(string chatIdentifier, int pageNumber = 1)
+        public async Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPaginatedChatMessages(string sender, string receiver, int pageNumber = 1)
         {
             int pageSize = 30;
             // Ensure pageNumber is at least 1
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             int skip = (pageNumber - 1) * pageSize;
 
-            // Find all matches for email patterns
-            var matches = chatIdentifier.Split(" ");
-
-            string email1, email2;
-            if (matches.Length == 2)
-            {
-                email1 = matches[0];
-                email2 = matches[1];
-                //Console.WriteLine($"First email: {email1}");
-                //Console.WriteLine($"Second email: {email2}");
-            }
-            else
-            {
-                //Console.WriteLine($"Could not split into exactly two emails. {matches[0]}");
-                throw new RestException(HttpStatusCode.BadRequest, "invalid chat identifier");
-            }
-
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _chatMessageRepository.CountAsync(x => x.ChatIdentifier == email1 + email2 || x.ChatIdentifier == email2 + email1);
+            int totalCount = await _chatMessageRepository.CountAsync(x => x.ChatIdentifier == sender + receiver || x.ChatIdentifier == receiver + sender);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => x.ChatIdentifier == email1 + email2 || x.ChatIdentifier == email2 + email1, skip, pageSize, p => p.CreatedAt);
+            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => x.ChatIdentifier == sender + receiver || x.ChatIdentifier == sender + receiver, skip, pageSize, p => p.CreatedAt);
 
             //if(allChatMessages == null) 
             //    throw new RestException(HttpStatusCode.NotFound, ResponseMessages)

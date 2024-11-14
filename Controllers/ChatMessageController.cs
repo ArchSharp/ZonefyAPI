@@ -42,16 +42,17 @@ namespace ZonefyDotnet.Controllers
         /// <summary>
         /// Endpoint to get chat messages between property owner and interested renter/purchaser
         /// </summary>
-        /// <param name="chatIdentifier"></param>
+        /// <param name="sender"></param>
+        /// <param name="receiver"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         [HttpGet()]
         [Route("GetByChatIdentifier")]
         [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>), 200)]
-        public async Task<IActionResult> GetChatMessages(string chatIdentifier, int pageNumber)
+        public async Task<IActionResult> GetChatMessages(string sender, string receiver, int pageNumber)
         {
 
-            var response = await _chatMessageService.GetPaginatedChatMessages(chatIdentifier, pageNumber);
+            var response = await _chatMessageService.GetPaginatedChatMessages(sender, receiver, pageNumber);
 
             return Ok(response);
         }
