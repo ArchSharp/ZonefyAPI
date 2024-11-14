@@ -83,7 +83,7 @@ namespace ZonefyDotnet.Services.Implementations
                         var fileMetadata = new Google.Apis.Drive.v3.Data.File
                         {
                             Name = file.FileName,  // Use the file's original name or customize as needed
-                            Parents = new List<string> { "1fVdMQDJdCOsYtINW13rG0sRVudkjmRTV" }  // Specify the Google Drive folder ID if needed
+                            Parents = new List<string> { "1eNBmN01prburcB9S2wtVVkJHC5W3jJcw" }  // Specify the Google Drive folder ID if needed
                         };
 
                         var request = _driveService.Files.Create(fileMetadata, stream, "image/jpeg");
