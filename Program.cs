@@ -19,6 +19,7 @@ builder.Services.Configure<GoogleTwoFactorAuthSettings>(builder.Configuration.Ge
 builder.Services.Configure<TwilioFnParameters>(builder.Configuration.GetSection("TwilioFnParameters"));
 //builder.Services.Configure<SendGridEmailSettings>(builder.Configuration.GetSection("SendGridEmailSettings"));
 builder.Services.Configure<RabbitMQMessageBroker>(builder.Configuration.GetSection("RabbitMQMessageBroker"));
+builder.Services.Configure<DriveAccess>(builder.Configuration.GetSection("DriveAccess"));
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new AutofacContainerModule()));

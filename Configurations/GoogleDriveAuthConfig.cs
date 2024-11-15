@@ -1,15 +1,21 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using Microsoft.Extensions.Options;
+using ZonefyDotnet.Helpers;
 
 namespace ZonefyDotnet.Configurations
 {
    public class GoogleDriveAuthConfig
     {
         public DriveService DriveService { get; private set; }
+        private readonly DriveAccess _driveAccess;
 
-        public GoogleDriveAuthConfig()
+        public GoogleDriveAuthConfig(
+            IOptions<DriveAccess> driveAccess
+            )
         {
+            _driveAccess = driveAccess.Value;
             DriveService = CreateDriveService();
 
             // Call the test method to verify the setup
@@ -27,7 +33,7 @@ namespace ZonefyDotnet.Configurations
             //    .CreateScoped(DriveService.Scope.DriveFile);
 
             // Load the service account credential
-            var credentialPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+            var credentialPath = _driveAccess.ServiceAccount;// Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
             Console.WriteLine($"Credential Path: {credentialPath}");
             var credential = GoogleCredential
                 .FromJson(credentialPath)

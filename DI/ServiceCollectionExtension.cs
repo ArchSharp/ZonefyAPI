@@ -221,22 +221,37 @@ namespace ZonefyDotnet.DI
             });
         }
 
+        //public static void ConfigureGoogleDriveService(this IServiceCollection services)
+        //{
+        //    // Register the GoogleDriveAuthConfig as a singleton
+        //    var googleDriveAuthConfig = new GoogleDriveAuthConfig();
+        //    services.AddSingleton(googleDriveAuthConfig);
+
+        //    // Register the DriveService as a singleton using the authenticated instance
+        //    services.AddSingleton(googleDriveAuthConfig.CreateDriveService());
+
+        //    // Register GoogleDriveService and its interface
+        //    services.AddTransient<IGoogleDriveService, GoogleDriveService>();
+        //    //services.AddSingleton<DriveService>(provider =>
+        //    //{
+        //    //    var googleDriveAuthConfig = provider.GetRequiredService<GoogleDriveAuthConfig>();
+        //    //    return googleDriveAuthConfig.CreateDriveService();
+        //    //});
+        //}
         public static void ConfigureGoogleDriveService(this IServiceCollection services)
         {
-            // Register the GoogleDriveAuthConfig as a singleton
-            var googleDriveAuthConfig = new GoogleDriveAuthConfig();
-            services.AddSingleton(googleDriveAuthConfig);
+            // Register the GoogleDriveAuthConfig as a singleton, letting DI resolve its dependencies
+            services.AddSingleton<GoogleDriveAuthConfig>();
 
             // Register the DriveService as a singleton using the authenticated instance
-            services.AddSingleton(googleDriveAuthConfig.CreateDriveService());
+            services.AddSingleton(provider =>
+            {
+                var googleDriveAuthConfig = provider.GetRequiredService<GoogleDriveAuthConfig>();
+                return googleDriveAuthConfig.DriveService; // Use the initialized DriveService
+            });
 
             // Register GoogleDriveService and its interface
             services.AddTransient<IGoogleDriveService, GoogleDriveService>();
-            //services.AddSingleton<DriveService>(provider =>
-            //{
-            //    var googleDriveAuthConfig = provider.GetRequiredService<GoogleDriveAuthConfig>();
-            //    return googleDriveAuthConfig.CreateDriveService();
-            //});
         }
     }
 }
