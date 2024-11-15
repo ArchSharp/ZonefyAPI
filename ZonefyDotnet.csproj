@@ -10,6 +10,7 @@
 
 	<NoWarn>CS1591</NoWarn>
 	<NoWarn>CS8618</NoWarn>
+	<UserSecretsId>9d90fb43-c055-4934-b53b-137b76b994df</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

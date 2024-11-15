@@ -27,6 +27,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
+# Copy service account file from the build context
+COPY service-account.json /app/service-account.json
+
+# Set environment variable for the file
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
+
 # Copy csproj and restore dependencies
 COPY *.csproj ./
 RUN dotnet restore

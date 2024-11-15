@@ -18,12 +18,19 @@ namespace ZonefyDotnet.Configurations
 
         public DriveService CreateDriveService()
         {
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zoneefystorage-ee7b59340270.json");
-            Console.WriteLine("Using Service Account File: " + filePath);
+            //var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zoneefystorage-ee7b59340270.json");
+            //Console.WriteLine("Using Service Account File: " + filePath);
+
+            //// Load the service account credential
+            //var credential = GoogleCredential
+            //    .FromFile(filePath)
+            //    .CreateScoped(DriveService.Scope.DriveFile);
 
             // Load the service account credential
+            var credentialPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+            Console.WriteLine($"Credential Path: {credentialPath}");
             var credential = GoogleCredential
-                .FromFile(filePath)
+                .FromJson(credentialPath)
                 .CreateScoped(DriveService.Scope.DriveFile);
 
             // Initialize the DriveService with the service account credentials
