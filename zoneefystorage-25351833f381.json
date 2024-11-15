@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "zoneefystorage",
+  "private_key_id": "25351833f3818febcb2fd20957cbf50f08f7f72e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCyBFrsnZzRxUG1\nMHvOT25lpqqKV0V0HE7fruiltwu7ufPU6DN2377idcGSV//UH1oPrY1PDq8WfCA2\nOLrCfD+Y2qednBEBPdbTXzfahEne9hpBXf46CoSziVChsCgyqVSp5BHUu06gPX+Z\ncPFVU9tb5H5V7oxF/JeSiojQYHGPv0OZoM3mQ5dJg7Nn3d/13MJZjnuOL4spfM6Q\nT5FRKCsDKYaPqKr0cI2UrD82GEQzwo4OBBDQbgPbKldfSp+EdgvdO/UJ8LevbGbc\n9Y3kY+j06g7OaMfe0w3DLfHTe8bsWOdy/36kYhfPo973qWsfGlwFn3gwK/51pTNt\ngRPA1suxAgMBAAECggEAIYv5D4CHOi/EWW8M0bz9xqmxFzdphv9DrNsDDCGR1Dtv\ndAabFjKFgBslUp0DQLf0yqIP0F9pxuC22Ej6BucPvBAuiKDNwpBjALu/pI4L9ril\ni355R3pOdh/xIjs2ZA+tfQOWCaMPptpYBrQ2Qnh2TNujJDH7XMAEV1EEhdI67FXT\nHzj6ye1yh/4KYbC7/laOO4paOiSMM62SRXhJ+v2MGZm5LPXrb5z35mp2hl5KA/kS\nOwMdp43H3X9rcVR9n1bXDy0LWZmE1IriGnjT224+CkJXsLEQB7RaRf24Tz4iHhZZ\n6b3RN6yXiAqyjaqeCUe/JjmdHi9IeKiFzRbVKb6cPQKBgQD6OWTp5awsAg+UOP52\nHPyKQ8hh3vkD3o3DGcpX0mvukSO2jv2xhxpXXhb5GIrjIHT5Q9uo3htoiGmiP+fn\nHxFW/yuGDByhe/FS5TxpSk+zZdFi9tcnO9kbnI66VFDQnGhNM+SUG4IF3yPBXjVf\nHLzDRqHMyTcPHncvBgs05ZGQzQKBgQC2IEefZLr1aKNelMFVNetKrnpGl6pEsBu1\nzrfaxBjNQBt9FeLyuIaLdfp0i5JbPXkYmsQFPsEptfE33IB7YsGo3DecC/Z0q06K\nSGOQf3DkL0mMuRPSm2m2p0hlKCbIejSfXU6FKbh9gZ6xb8ksh2eNiwEFOjTU+a9M\n9MXkZlYWdQKBgQCaKHH7h/wiwMJIVzSuH/2WUVxKr8xKjfpYkLMQmBrWx6Rw/Hdf\nwBSCbv1ISc6HT5/BUgUqbGwGYsRxqV1+Dq3oIxz1YNDizDFJGOG3HIktxTTS+7Bi\nA4UmdbWZJgkD/Nhld+sDNE9OvsKQhzHqfxHsXL+iIvVA40waNGcDF8wuoQKBgQCp\nc38wHliU3Laj2WPIFFLHOW8rHxGctv4ROjR1pt4smej5iNOPYYBNYYeVyAZ0Pc3d\nxqF6/9hZJp84ikBAjLICmmJjHf5AruJ0ZsW8O9adeCHGfKyk11SUTTBebe0nugwb\n+oSEAT1WCLPOA2P5ukHuv9ZDNtTREz63K0a0K0MNwQKBgFZTAcDB16TJ5dLs8BOo\nIGb6eh3hfViu8Df7EC3w6AF0u7Ox8iL11mlV7WVcODpmneQMsdS/2hp/2soIo2LE\nUsJ9GwFCCVrSToJWgEjdpY9+Z5j/Zx8zzb8DzopT/64mgrFdZf3lF/XCpkCltNcH\nP5gPsP8h+P/jgGmr66rYu7uB\n-----END PRIVATE KEY-----\n",
+  "client_email": "zonefystorage@zoneefystorage.iam.gserviceaccount.com",
+  "client_id": "116471458008477900798",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/zonefystorage%40zoneefystorage.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
