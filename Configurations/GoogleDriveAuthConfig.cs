@@ -34,9 +34,13 @@ namespace ZonefyDotnet.Configurations
 
             // Load the service account credential
             var credentialPath = _driveAccess.ServiceAccount;// Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+            if (string.IsNullOrWhiteSpace(credentialPath))
+            {
+                throw new InvalidOperationException("ServiceAccount JSON is not configured properly.");
+            }
             Console.WriteLine($"Credential Path: {credentialPath}");
             var credential = GoogleCredential
-                .FromJson(credentialPath)
+                .FromFile(credentialPath)
                 .CreateScoped(DriveService.Scope.DriveFile);
 
             // Initialize the DriveService with the service account credentials
