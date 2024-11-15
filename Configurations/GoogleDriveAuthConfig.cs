@@ -20,6 +20,7 @@ namespace ZonefyDotnet.Configurations
         {
             var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "zoneefystorage-ee7b59340270.json");
             Console.WriteLine("Using Service Account File: " + filePath);
+
             // Load the service account credential
             var credential = GoogleCredential
                 .FromFile(filePath)
