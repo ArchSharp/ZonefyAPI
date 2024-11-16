@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.Token;
+using Google.Apis.Drive.v3;
 using System.Net;
 using ZonefyDotnet.Common;
 using ZonefyDotnet.DTOs;
@@ -13,17 +14,20 @@ namespace ZonefyDotnet.Services.Implementations
 {
     public class HousePropertyService : IHousePropertyService
     {
+        private readonly DriveService _driveService;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<HouseProperty> _propertyRepository;
         private readonly IRepository<PropertyStatistics> _propertyStatisticsRepository;
         private readonly IMapper _mapper;
 
         public HousePropertyService(
+            DriveService driveService,
             IRepository<User> userRepository,
             IRepository<HouseProperty> propertyRepository,
             IRepository<PropertyStatistics> propertyStatisticsRepository,
             IMapper mapper)
         {
+            _driveService = driveService;
             _userRepository = userRepository;
             _propertyRepository = propertyRepository;
             _propertyStatisticsRepository = propertyStatisticsRepository;
@@ -60,6 +64,22 @@ namespace ZonefyDotnet.Services.Implementations
 
             if (findProperty == null)
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+
+            if(findProperty.PropertyImageUrl?.Count() > 0){
+                foreach (var fileId in findProperty.PropertyImageUrl)
+                {
+                    try
+                    {
+                        await _driveService.Files.Delete(fileId).ExecuteAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error for debugging
+                        Console.WriteLine(ex+ $"Failed to delete file with ID: {fileId}");
+                        // You can choose to continue or rethrow depending on your requirements
+                    }
+                }
+            }
 
             var name = findProperty.PropertyName;
             _propertyRepository.Remove(findProperty);

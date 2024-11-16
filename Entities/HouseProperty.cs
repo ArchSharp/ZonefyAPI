@@ -18,7 +18,7 @@ namespace ZonefyDotnet.Entities
         public string PropertyLocation { get; set; }
         public int Guests { get; set; }
         public double Dimension { get; set; }
-        public  bool IsApproved { get; set; }
+        public bool IsApproved { get; set; } = false;
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
         public DateTime CheckInTime { get; set; }
