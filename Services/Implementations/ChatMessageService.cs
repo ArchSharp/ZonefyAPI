@@ -141,7 +141,7 @@ namespace ZonefyDotnet.Services.Implementations
 
 
             // Fetch the paginated data
-            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => (x.ChatIdentifier == sender + receiver || x.ChatIdentifier == sender + receiver) && x.PropertyId == propertyId, skip, pageSize, p => p.CreatedAt);
+            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => (x.ChatIdentifier == sender + receiver || x.ChatIdentifier == receiver + sender) && x.PropertyId == propertyId, skip, pageSize, p => p.CreatedAt);
 
             //if(allChatMessages == null) 
             //    throw new RestException(HttpStatusCode.NotFound, ResponseMessages)
