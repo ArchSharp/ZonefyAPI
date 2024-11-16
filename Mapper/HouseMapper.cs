@@ -10,6 +10,7 @@ namespace ZonefyDotnet.Mapper
         {
             CreateMap<CreateHousePropertyDTO, HouseProperty>();
             CreateMap<HouseProperty, GetHousePropertyDTO>();
+            CreateMap<PropertyStatistics, GetPropertyStatisticDTO>();
         }
     }
 }

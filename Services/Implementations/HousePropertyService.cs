@@ -7,6 +7,7 @@ using ZonefyDotnet.Entities;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Repositories.Interfaces;
 using ZonefyDotnet.Services.Interfaces;
+using static QRCoder.PayloadGenerator;
 
 namespace ZonefyDotnet.Services.Implementations
 {
@@ -14,15 +15,18 @@ namespace ZonefyDotnet.Services.Implementations
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<HouseProperty> _propertyRepository;
+        private readonly IRepository<PropertyStatistics> _propertyStatisticsRepository;
         private readonly IMapper _mapper;
 
         public HousePropertyService(
             IRepository<User> userRepository,
             IRepository<HouseProperty> propertyRepository,
+            IRepository<PropertyStatistics> propertyStatisticsRepository,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _propertyRepository = propertyRepository;
+            _propertyStatisticsRepository = propertyStatisticsRepository;
             _mapper = mapper;
         }
 
@@ -140,6 +144,79 @@ namespace ZonefyDotnet.Services.Implementations
             };
         }
 
+        public async Task<SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>> GetAllUserPropertyStatisticsByEmail(string email, int pageNumber)
+        {
+            int pageSize = 30;
+            // Ensure pageNumber is at least 1
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Retrieve the total count of properties for the given email for pagination metadata
+            int totalCount = await _propertyStatisticsRepository.CountAsync(x => x.CreatorEmail == email);
+
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+
+            // Fetch the paginated data
+            var allProperties = await _propertyStatisticsRepository.FindPaginatedAsync(x => x.CreatorEmail == email, skip, pageSize, p => p.CreatedAt);
+
+
+            var propertiesResponse = _mapper.Map<IEnumerable<GetPropertyStatisticDTO>>(allProperties);
+
+            var paginatedResponse = new PaginatedResponse<GetPropertyStatisticDTO>
+            {
+                Data = propertiesResponse,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalRecords = totalCount
+            };
+
+            return new SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>
+            {
+                Data = paginatedResponse,
+                Code = 200,
+                Message = ResponseMessages.FetchedSuccesss,
+                ExtraInfo = "",
+            };
+        }
+
+        public async Task<SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>> GetPropertyStatisticsById(Guid id, int pageNumber = 1)
+        {
+            int pageSize = 30;
+            // Ensure pageNumber is at least 1
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Retrieve the total count of properties for the given email for pagination metadata
+            int totalCount = await _propertyStatisticsRepository.CountAsync(x => x.PropertyId == id);
+
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+
+            // Fetch the paginated data
+            var allProperties = await _propertyStatisticsRepository.FindPaginatedAsync(x => x.PropertyId == id, skip, pageSize, p => p.CreatedAt);
+
+
+            var propertiesResponse = _mapper.Map<IEnumerable<GetPropertyStatisticDTO>>(allProperties);
+
+            var paginatedResponse = new PaginatedResponse<GetPropertyStatisticDTO>
+            {
+                Data = propertiesResponse,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalRecords = totalCount
+            };
+
+            return new SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>
+            {
+                Data = paginatedResponse,
+                Code = 200,
+                Message = ResponseMessages.FetchedSuccesss,
+                ExtraInfo = "",
+            };
+        }
 
         public async Task<SuccessResponse<GetHousePropertyDTO>> UpdateHouseProperty(UpdateHousePropertyDTO model)
         {

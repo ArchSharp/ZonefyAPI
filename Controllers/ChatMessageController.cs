@@ -44,15 +44,16 @@ namespace ZonefyDotnet.Controllers
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="receiver"></param>
+        /// <param name="propertyId"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         [HttpGet()]
-        [Route("GetByChatIdentifier")]
+        [Route("GetByUserIdsPropId")]
         [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>), 200)]
-        public async Task<IActionResult> GetChatMessages(string sender, string receiver, int pageNumber)
+        public async Task<IActionResult> GetChatMessages(string sender, string receiver, Guid propertyId, int pageNumber)
         {
 
-            var response = await _chatMessageService.GetPaginatedChatMessages(sender, receiver, pageNumber);
+            var response = await _chatMessageService.GetPropertyUserMessages(sender, receiver, propertyId, pageNumber);
 
             return Ok(response);
         }

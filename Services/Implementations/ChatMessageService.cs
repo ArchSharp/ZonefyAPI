@@ -12,6 +12,8 @@ namespace ZonefyDotnet.Services.Implementations
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<ChatMessage> _chatMessageRepository;
+        private readonly IRepository<PropertyStatistics> _propertyStatisticsRepository;
+        private readonly IRepository<HouseProperty> _propertyRepository;
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
 
@@ -19,12 +21,16 @@ namespace ZonefyDotnet.Services.Implementations
             IRepository<User> userRepository,
             IMapper mapper,
             INotificationService notificationService,
-            IRepository<ChatMessage> chatMessageRepository)
+            IRepository<ChatMessage> chatMessageRepository,
+            IRepository<PropertyStatistics> propertyStatisticsRepository,
+            IRepository<HouseProperty> propertyRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _notificationService = notificationService;
             _chatMessageRepository = chatMessageRepository;
+            _propertyStatisticsRepository = propertyStatisticsRepository;
+            _propertyRepository = propertyRepository;
         }
 
         public async Task<SuccessResponse<string>> DeleteChatMessages(string chatIdentifier)
@@ -121,7 +127,7 @@ namespace ZonefyDotnet.Services.Implementations
             };
         }
 
-        public async Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPaginatedChatMessages(string sender, string receiver, int pageNumber = 1)
+        public async Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPropertyUserMessages(string sender, string receiver, Guid propertyId, int pageNumber = 1)
         {
             int pageSize = 30;
             // Ensure pageNumber is at least 1
@@ -129,13 +135,13 @@ namespace ZonefyDotnet.Services.Implementations
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _chatMessageRepository.CountAsync(x => x.ChatIdentifier == sender + receiver || x.ChatIdentifier == receiver + sender);
+            int totalCount = await _chatMessageRepository.CountAsync(x => (x.ChatIdentifier == sender + receiver || x.ChatIdentifier == receiver + sender) && x.PropertyId == propertyId);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => x.ChatIdentifier == sender + receiver || x.ChatIdentifier == sender + receiver, skip, pageSize, p => p.CreatedAt);
+            var allChatMessages = await _chatMessageRepository.FindPaginatedAsync(x => (x.ChatIdentifier == sender + receiver || x.ChatIdentifier == sender + receiver) && x.PropertyId == propertyId, skip, pageSize, p => p.CreatedAt);
 
             //if(allChatMessages == null) 
             //    throw new RestException(HttpStatusCode.NotFound, ResponseMessages)
@@ -176,6 +182,23 @@ namespace ZonefyDotnet.Services.Implementations
 
             if (findUSender.Email == findReceiver.Email)
                 throw new RestException(HttpStatusCode.BadRequest, "You cannot send message to yourself");
+
+            var findProperty = await _propertyRepository.FirstOrDefault(x=>x.Id== request.PropertyId);
+
+            string interestedUserId = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
+
+            var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserId);
+            if (findStatistics == null)
+            {
+                var newPayload = new PropertyStatistics
+                {
+                    CreatorEmail = findProperty.CreatorEmail,
+                    UserEmail = interestedUserId,
+                    PropertyId = request.PropertyId
+                };
+                await _propertyStatisticsRepository.AddAsync(newPayload);
+                await _propertyStatisticsRepository.SaveChangesAsync();
+            }
 
             var newChat = _mapper.Map<ChatMessage>(request);
             newChat.ChatIdentifier = request.SenderEmail.Trim() + request.ReceiverEmail.Trim();

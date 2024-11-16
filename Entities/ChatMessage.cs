@@ -3,6 +3,7 @@
     public class ChatMessage
     {
         public Guid Id { get; set; }
+        public Guid PropertyId { get; set; }
         public Guid SenderId { get; set; }
         public Guid ReceiverId { get; set; }
         public string ChatIdentifier { get; set; }

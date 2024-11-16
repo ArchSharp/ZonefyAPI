@@ -16,5 +16,6 @@ namespace ZonefyDotnet.Database
         public DbSet<HouseProperty> HouseProperties { get; set; }
         public DbSet<ForgotPassword> ForgotPasswords { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<PropertyStatistics> PropertyStatistics { get; set; }
     }
 }

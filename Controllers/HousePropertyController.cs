@@ -79,6 +79,42 @@ namespace ZonefyDotnet.Controllers
         }
 
         /// <summary>
+        /// Endpoint to get all property statistics by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("GetPropertyStatisticsById")]
+        [Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>), 200)]
+        public async Task<IActionResult> GetPropertyStatisticsById(Guid id, int pageNumber)
+        {
+
+            var response = await _propertyService.GetPropertyStatisticsById(id, pageNumber);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to get all user property statistics by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("GetAllUserPropertyStatisticsByEmail")]
+        [Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>), 200)]
+        public async Task<IActionResult> GetAllUserPropertyStatisticsByEmail(string email, int pageNumber)
+        {
+
+            var response = await _propertyService.GetAllUserPropertyStatisticsByEmail(email, pageNumber);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Endpoint to update house properties
         /// </summary>
         /// <param name="model"></param>

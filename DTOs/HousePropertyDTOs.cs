@@ -4,17 +4,27 @@ namespace ZonefyDotnet.DTOs
 {
     public class CreateHousePropertyDTO
     {
+        [Required]
         [EmailAddress]
         public string CreatorEmail { get; set; }
+        [Required]
         public string OwnerName { get; set; }
+        [Required]
         public string OwnerPhoneNumber { get; set; }
+        [Required]
         public string PropertyName { get; set; }
+        [Required]
         public double PropertyPrice { get; set; }
+        [Required]
         public string PropertyDescription { get; set; }
+        [Required]
         public string PropertyType { get; set; }
+        [Required]
         //public List<string>?  PropertyImageUrl { get; set; }
         public string PropertyLocation { get; set; }
+        [Required]
         public int ToiletNumber { get; set; }
+        [Required]
         public int ParkingLot { get; set; }
     }
 
@@ -38,6 +48,7 @@ namespace ZonefyDotnet.DTOs
 
     public class UpdateHousePropertyDTO
     {
+        [Required]
         public Guid Id { get; set; }
         public string CreatorEmail { get; set; }
         public string OwnerName { get; set; }
