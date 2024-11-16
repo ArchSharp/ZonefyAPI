@@ -185,15 +185,16 @@ namespace ZonefyDotnet.Services.Implementations
 
             var findProperty = await _propertyRepository.FirstOrDefault(x=>x.Id== request.PropertyId);
 
-            string interestedUserId = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
+            string interestedUserEmail = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
 
-            var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserId);
+            var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserEmail);
             if (findStatistics == null)
             {
                 var newPayload = new PropertyStatistics
                 {
                     CreatorEmail = findProperty.CreatorEmail,
-                    UserEmail = interestedUserId,
+                    PropertyName = findProperty.PropertyName,
+                    UserEmail = interestedUserEmail,
                     PropertyId = request.PropertyId
                 };
                 await _propertyStatisticsRepository.AddAsync(newPayload);

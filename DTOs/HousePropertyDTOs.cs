@@ -26,6 +26,14 @@ namespace ZonefyDotnet.DTOs
         public int ToiletNumber { get; set; }
         [Required]
         public int ParkingLot { get; set; }
+        [Required]
+        public int Guests { get; set; }
+        [Required]
+        public double Dimension { get; set; }
+        [Required]
+        public DateTime CheckInTime { get; set; }
+        [Required]
+        public DateTime CheckOutTime { get; set; }
     }
 
     public class GetHousePropertyDTO
@@ -42,6 +50,10 @@ namespace ZonefyDotnet.DTOs
         public string PropertyLocation { get; set; }
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
+        public int Guests { get; set; }
+        public double Dimension { get; set; }
+        public DateTime CheckInTime { get; set; }
+        public DateTime CheckOutTime { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
@@ -61,5 +73,9 @@ namespace ZonefyDotnet.DTOs
         public string PropertyLocation { get; set; }
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
+        public int Guests { get; set; }
+        public double Dimension { get; set; }
+        public DateTime CheckInTime { get; set; }
+        public DateTime CheckOutTime { get; set; }
     }
 }

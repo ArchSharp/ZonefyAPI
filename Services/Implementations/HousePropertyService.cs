@@ -152,13 +152,13 @@ namespace ZonefyDotnet.Services.Implementations
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _propertyStatisticsRepository.CountAsync(x => x.CreatorEmail == email);
+            int totalCount = await _propertyStatisticsRepository.CountAsync(x => x.CreatorEmail == email || x.UserEmail == email);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allProperties = await _propertyStatisticsRepository.FindPaginatedAsync(x => x.CreatorEmail == email, skip, pageSize, p => p.CreatedAt);
+            var allProperties = await _propertyStatisticsRepository.FindPaginatedAsync(x => x.CreatorEmail == email || x.UserEmail == email, skip, pageSize, p => p.CreatedAt);
 
 
             var propertiesResponse = _mapper.Map<IEnumerable<GetPropertyStatisticDTO>>(allProperties);

@@ -3,6 +3,7 @@
     public class GetPropertyStatisticDTO
     {
         public Guid PropertyId { get; set; }
+        public string PropertyName { get; set; }
         public string CreatorEmail { get; set; }
         public string UserEmail { get; set; }
         public DateTime CreatedAt { get; set; }

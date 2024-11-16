@@ -16,8 +16,13 @@ namespace ZonefyDotnet.Entities
         public string PropertyType { get; set; }
         public List<string>? PropertyImageUrl { get; set; }
         public string PropertyLocation { get; set; }
+        public int Guests { get; set; }
+        public double Dimension { get; set; }
+        public  bool IsApproved { get; set; }
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
+        public DateTime CheckInTime { get; set; }
+        public DateTime CheckOutTime { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
