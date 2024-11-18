@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
-using Domain.Entities.Token;
 using Google.Apis.Drive.v3;
 using System.Net;
 using ZonefyDotnet.Common;
 using ZonefyDotnet.DTOs;
+//using ZonefyUser = ZonefyDotnet.Entities.User;
+//using ZonefyProp = ZonefyDotnet.Entities.HouseProperty;
+//using ZonefyPropStat = ZonefyDotnet.Entities.PropertyStatistics;
 using ZonefyDotnet.Entities;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Repositories.Interfaces;
 using ZonefyDotnet.Services.Interfaces;
-using static QRCoder.PayloadGenerator;
 
 namespace ZonefyDotnet.Services.Implementations
 {
@@ -41,8 +42,11 @@ namespace ZonefyDotnet.Services.Implementations
             if (findUser == null)
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
 
-            var newProperty = _mapper.Map<HouseProperty>(model);
+            model.CheckInTime = DateTime.SpecifyKind(model.CheckInTime, DateTimeKind.Utc);
+            model.CheckOutTime = DateTime.SpecifyKind(model.CheckOutTime, DateTimeKind.Utc);
 
+
+            var newProperty = _mapper.Map<HouseProperty>(model);
 
             await _propertyRepository.AddAsync(newProperty);
             await _propertyRepository.SaveChangesAsync();
