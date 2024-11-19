@@ -86,7 +86,7 @@ namespace ZonefyDotnet.Services.Implementations
                             Parents = new List<string> { "1eNBmN01prburcB9S2wtVVkJHC5W3jJcw" }  // Specify the Google Drive folder ID if needed
                         };
 
-                        var request = _driveService.Files.Create(fileMetadata, stream, "image/jpeg");
+                        var request = _driveService.Files.Create(fileMetadata, stream, file.ContentType);
                         request.Fields = "id";
 
                         var result = await request.UploadAsync();
@@ -98,6 +98,15 @@ namespace ZonefyDotnet.Services.Implementations
 
                         // Add the file ID to the list
                         uploadedFileIds.Add(request.ResponseBody.Id);
+
+                        // Set file permissions to make it publicly accessible
+                        var permission = new Google.Apis.Drive.v3.Data.Permission
+                        {
+                            Role = "reader",  // Read-only permission
+                            Type = "anyone"   // Accessible by anyone with the link
+                        };
+
+                        await _driveService.Permissions.Create(permission, request.ResponseBody.Id).ExecuteAsync();
                     }
                 }
 
