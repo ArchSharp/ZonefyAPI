@@ -258,7 +258,10 @@ namespace ZonefyDotnet.DI
         {
             var constring = configuration.GetValue<string>("Redis:ConnectionString");
             Console.WriteLine("redis con string di: " + constring);
-            services.AddSingleton(new RedisService(constring));
+            services.AddSingleton(opt =>
+            {
+                return new RedisService(constring);
+            });
         }
     }
 }
