@@ -78,4 +78,11 @@ namespace ZonefyDotnet.DTOs
         public DateTime CheckInTime { get; set; }
         public DateTime CheckOutTime { get; set; }
     }
+
+    public class GoogleDriveFile
+    {
+        public string FileName { get; set; }
+        public string MimeType { get; set; }
+        public MemoryStream Stream { get; set; }
+    }
 }

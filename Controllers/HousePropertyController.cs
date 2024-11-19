@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Apis.Drive.v3;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ZonefyDotnet.DTOs;
@@ -112,6 +113,32 @@ namespace ZonefyDotnet.Controllers
             var response = await _propertyService.GetAllUserPropertyStatisticsByEmail(email, pageNumber);
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Fetches a file from Google Drive by file ID.
+        /// </summary>
+        /// <param name="fileId">The ID of the file to fetch.</param>
+        /// <returns>The file as a downloadable response.</returns>
+        [HttpGet("Files/{fileId}")]
+        [ProducesResponseType(typeof(FileResult), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetFile(string fileId)
+        {
+            try
+            {
+                var file = await _googleDriveService.GetFileAsync(fileId);
+                return File(file.Stream, file.MimeType, file.FileName);
+            }
+            catch (FileNotFoundException)
+            {
+                return NotFound(new { Message = "File not found on Google Drive." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"An error occurred: {ex.Message}" });
+            }
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using Google.Apis.Upload;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net;
 using ZonefyDotnet.Common;
+using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Entities;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Repositories.Interfaces;
@@ -56,6 +57,38 @@ namespace ZonefyDotnet.Services.Implementations
             catch (Exception ex)
             {
                 throw new RestException(HttpStatusCode.InternalServerError, $"Error deleting file with ID {fileId}: {ex.Message}");
+            }
+        }
+
+        public async Task<GoogleDriveFile> GetFileAsync(string fileId)
+        {
+            try
+            {
+                // Fetch metadata for MIME type and name
+                var fileRequest = _driveService.Files.Get(fileId);
+                fileRequest.Fields = "mimeType, name";
+
+                var fileMetadata = await fileRequest.ExecuteAsync();
+                if (fileMetadata == null)
+                {
+                    throw new FileNotFoundException($"File with ID {fileId} not found.");
+                }
+
+                // Fetch file content
+                var stream = new MemoryStream();
+                await fileRequest.DownloadAsync(stream);
+                stream.Position = 0;
+
+                return new GoogleDriveFile
+                {
+                    FileName = fileMetadata.Name,
+                    MimeType = fileMetadata.MimeType,
+                    Stream = stream
+                };
+            }
+            catch (Google.GoogleApiException ex) when (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new FileNotFoundException($"File with ID {fileId} not found on Google Drive.");
             }
         }
 
