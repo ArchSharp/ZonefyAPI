@@ -134,6 +134,7 @@ namespace ZonefyDotnet.Controllers
                 var cachedFile = await _redisService.GetCacheAsync(fileId);
                 if (cachedFile != null)
                 {
+                    Console.WriteLine("Found image in redis cache");
                     // If file is found in cache, return it as an image
                     var fileCacheData = JsonConvert.DeserializeObject<FileCacheData>(cachedFile);
                     byte[] fileBytes = Convert.FromBase64String(fileCacheData.FileContent);
