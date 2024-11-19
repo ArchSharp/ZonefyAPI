@@ -253,5 +253,11 @@ namespace ZonefyDotnet.DI
             // Register GoogleDriveService and its interface
             services.AddTransient<IGoogleDriveService, GoogleDriveService>();
         }
+
+        public static void ConfigureRedisServer(this IServiceCollection services, IConfiguration configuration)
+        {
+            var constring = configuration.GetValue<string>("Redis:ConnectionString");
+            services.AddSingleton(new RedisService(constring));
+        }
     }
 }

@@ -85,4 +85,10 @@ namespace ZonefyDotnet.DTOs
         public string MimeType { get; set; }
         public MemoryStream Stream { get; set; }
     }
+
+    public class FileCacheData
+    {
+        public string FileContent { get; set; }  // Base64 encoded file content
+        public string FileName { get; set; }     // The name of the file
+    }
 }

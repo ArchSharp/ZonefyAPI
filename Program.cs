@@ -20,6 +20,7 @@ builder.Services.Configure<TwilioFnParameters>(builder.Configuration.GetSection(
 //builder.Services.Configure<SendGridEmailSettings>(builder.Configuration.GetSection("SendGridEmailSettings"));
 builder.Services.Configure<RabbitMQMessageBroker>(builder.Configuration.GetSection("RabbitMQMessageBroker"));
 builder.Services.Configure<DriveAccess>(builder.Configuration.GetSection("DriveAccess"));
+//builder.Services.Configure<string>(builder.Configuration.GetSection("Redis"));
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new AutofacContainerModule()));
@@ -42,6 +43,7 @@ builder.Services.ConfigureApiVersioning(builder.Configuration);
 builder.Services.ConfigureMvc();//register automapper
 builder.Services.ConfigureRateLimiting();
 builder.Services.ConfigureGoogleDriveService();
+builder.Services.ConfigureRedisServer(builder.Configuration);
 
 
 

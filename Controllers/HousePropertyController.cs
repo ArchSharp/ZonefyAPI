@@ -1,7 +1,6 @@
-﻿using Google.Apis.Drive.v3;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Services.Implementations;
@@ -17,15 +16,18 @@ namespace ZonefyDotnet.Controllers
     {
         private readonly IHousePropertyService _propertyService;
         private readonly IGoogleDriveService _googleDriveService;
+        private readonly RedisService _redisService;
         /// <summary>
         /// This class represents a controller for user-related actions.
         /// </summary>
         public HousePropertyController(
             IHousePropertyService propertyService,
-            IGoogleDriveService googleDriveService)
+            IGoogleDriveService googleDriveService,
+             RedisService redisService)
         {
             _propertyService = propertyService;
             _googleDriveService = googleDriveService;
+            _redisService = redisService;
         }
 
         /// <summary>
@@ -128,8 +130,43 @@ namespace ZonefyDotnet.Controllers
         {
             try
             {
+                // Check if the file is cached in Redis first
+                var cachedFile = await _redisService.GetCacheAsync(fileId);
+                if (cachedFile != null)
+                {
+                    // If file is found in cache, return it as an image
+                    var fileCacheData = JsonConvert.DeserializeObject<FileCacheData>(cachedFile);
+                    byte[] fileBytes = Convert.FromBase64String(fileCacheData.FileContent);
+                    var mimeType = GetMimeType(fileBytes); // Dynamically determine MIME type
+                    return File(fileBytes, mimeType, fileCacheData.FileName); // Include the file name
+                }
+
+                // If the file is not in the cache, fetch it from Google Drive
                 var file = await _googleDriveService.GetFileAsync(fileId);
-                return File(file.Stream, file.MimeType, file.FileName);
+
+                // Cache the file in Redis (store the file as a base64 string for easy caching)
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.Stream.CopyToAsync(memoryStream);
+                    byte[] fileBytes = memoryStream.ToArray();
+                    string base64File = Convert.ToBase64String(fileBytes);
+
+                    // Create an object with both file content and filename
+                    var fileCacheData = new FileCacheData
+                    {
+                        FileContent = base64File,
+                        FileName = file.FileName
+                    };
+
+                    // Store the file in Redis with filename (TTL can be adjusted)
+                    var cacheData = JsonConvert.SerializeObject(fileCacheData);
+                    await _redisService.SetCacheAsync(fileId, cacheData, TimeSpan.FromHours(1));
+
+
+                    // Return the file as response
+                    var mimeType = GetMimeType(fileBytes);
+                    return File(fileBytes, mimeType, file.FileName);
+                }
             }
             catch (FileNotFoundException)
             {
@@ -140,6 +177,7 @@ namespace ZonefyDotnet.Controllers
                 return StatusCode(500, new { Message = $"An error occurred: {ex.Message}" });
             }
         }
+
 
         /// <summary>
         /// Endpoint to update house properties
@@ -210,6 +248,36 @@ namespace ZonefyDotnet.Controllers
 
             return Ok(response);
         }
+
+        private string GetMimeType(byte[] fileBytes)
+        {
+            // Check the file's signature (magic bytes) to determine the MIME type
+            var header = fileBytes.Take(4).ToArray();
+
+            if (header.SequenceEqual(new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }))
+            {
+                return "image/jpeg";  // JPEG
+            }
+            if (header.SequenceEqual(new byte[] { 0x89, 0x50, 0x4E, 0x47 }))
+            {
+                return "image/png";  // PNG
+            }
+            if (header.SequenceEqual(new byte[] { 0x47, 0x49, 0x46, 0x38 }))
+            {
+                return "image/gif";  // GIF
+            }
+            if (header.SequenceEqual(new byte[] { 0x42, 0x4D }))
+            {
+                return "image/bmp";  // BMP
+            }
+            if (header.SequenceEqual(new byte[] { 0x49, 0x20, 0x49, 0x49 }))
+            {
+                return "image/tiff";  // TIFF
+            }
+
+            return "application/octet-stream";  // Default for unknown file types
+        }
+
     }
 }
 
