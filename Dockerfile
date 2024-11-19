@@ -53,6 +53,7 @@ COPY --from=build-env /app/Files ./Files
 
 # Expose port (if your API listens on 5018)
 EXPOSE 5018
+EXPOSE 6379
 
 # Run the app
 ENTRYPOINT ["dotnet", "ZonefyDotnet.dll"]
