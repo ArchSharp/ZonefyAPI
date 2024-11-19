@@ -18,8 +18,11 @@ namespace ZonefyDotnet.Services.Implementations
             {
                 var configurationOptions = ConfigurationOptions.Parse(redisConnectionString);
                 configurationOptions.AbortOnConnectFail = false;  // Avoid immediate failure on connection issues
+                configurationOptions.Password = "Alade1&&&";
                 _redis = ConnectionMultiplexer.Connect(configurationOptions);
                 _database = _redis.GetDatabase();
+                var result = _database.StringGet("test_key");
+                Console.WriteLine(result);
                 Console.WriteLine("redis con string: " + redisConnectionString);
             }
             catch (Exception ex)
