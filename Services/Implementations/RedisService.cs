@@ -10,6 +10,7 @@ namespace ZonefyDotnet.Services.Implementations
 
         public RedisService(string redisConnectionString)
         {
+            Console.WriteLine("redis con string: "+redisConnectionString);
             _redis = ConnectionMultiplexer.Connect(redisConnectionString);
             _database = _redis.GetDatabase();
 

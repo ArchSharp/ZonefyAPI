@@ -49,3 +49,78 @@ Installation Steps:
 # Set a password for the postgres user:
 	- ALTER USER postgres PASSWORD 'your_password';
 # Conclusion: PostgreSQL 17 is successfully installed, configured for remote access, and ready for use.
+
+
+# Installing Redis on Ubuntu machine
+
+# Step 1: Update System Packages
+	Update the package list to ensure your system is up to date:
+		
+		- sudo apt update && sudo apt upgrade -y
+
+# Step 2: Install Redis
+	Install Redis from the default Ubuntu repositories:
+
+		- sudo apt install redis -y
+
+# Step 3: Start and Enable Redis Service
+	Start the Redis service and enable it to start at boot:
+
+		- sudo systemctl start redis
+		- sudo systemctl enable redis
+
+# Step 4: Verify Redis Installation
+	Check the Redis version to confirm installation:
+
+		- redis-cli --version
+
+# Test Redis by running the CLI:
+
+		- redis-cli ping
+	You should see:
+
+		- PONG
+
+# Step 5: Configure Redis
+	Edit the Redis configuration file for remote access or custom settings:
+
+		- sudo nano /etc/redis/redis.conf
+
+	To allow remote connections: Find the bind 127.0.0.1 line and change it to:
+		
+		- bind 0.0.0.0
+
+	To secure remote connections: Enable a password by adding or uncommenting:
+		
+		- requirepass YourStrongPassword
+
+# Restart Redis to apply changes:
+
+		- sudo systemctl restart redis
+
+# Step 6: Open Redis Port (Optional)
+	Allow Redis port (default: 6379) through the firewall if remote access is needed:
+
+		- sudo ufw allow 6379
+
+# Step 7: Test Redis Connection
+	Local connection:
+		- redis-cli
+	Run:
+		- AUTH YourStrongPassword
+		- ping
+	You should see:
+		- PONG
+
+# Remote connection (from another machine with Redis CLI installed):
+		
+		- redis-cli -h your_server_ip -p 6379 -a YourStrongPassword
+
+# Step 8: Secure Redis (Optional)
+	For production environments:
+
+	Use a firewall to restrict access to the Redis port.
+	Use strong passwords.
+	Configure Redis to listen only to trusted IP addresses.
+
+Redis is now installed and ready to use on your Ubuntu VPS!
