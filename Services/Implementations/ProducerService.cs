@@ -1,65 +1,79 @@
-﻿using Domain.Entities.Configurations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Services.Interfaces;
 
-namespace Application.Services.Implementations.RabbitMQMessageBrokerService
+public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
 {
-    public class ProducerService : IProducerService, IDisposable
+    private readonly ILogger _logger;
+    private readonly IConnection _connection;
+    private readonly RabbitMQMessageBroker _rabbitMQMessageBroker;
+
+    public ProducerService(
+        ILogger<ProducerService> logger,
+        IRabbitMQConfig rabbitMQConfig,
+        IOptions<RabbitMQMessageBroker> rabbitMQMessageBroker)
     {
-        private readonly ILogger _logger;
-        private readonly IConnection _connection;
-        private readonly RabbitMQMessageBroker _rabbitMQMessageBroker;
+        _connection = rabbitMQConfig.CreateRabbitMQConnection();
+        _logger = logger;
+        _rabbitMQMessageBroker = rabbitMQMessageBroker.Value;
+    }
 
-        public ProducerService(
-            ILogger<ProducerService> logger,
-            IRabbitMQConfig rabbitMQConfig,
-            IOptions<RabbitMQMessageBroker> rabbitMQMessageBroker)
+    public async Task SendMessage<T>(T message, string queue)
+    {
+        try
         {
-            _connection = rabbitMQConfig.CreateRabbitMQConnection(false);
-            _logger = logger;
-            _rabbitMQMessageBroker = rabbitMQMessageBroker.Value;
-        }
-
-        public void SendMessage<T>(T message, string queue)
-        {
-            using var channel = _connection.CreateModel();
+            await using var channel = await _connection.CreateChannelAsync();
             string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
             string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;
-            ConfigureChannel(channel, queue, exchange, routingKey);
-            //channel.QueueDeclare(queue, false, false, false, null);
+            await ConfigureChannelAsync(channel, queue, exchange, routingKey);
+
             string json = JsonConvert.SerializeObject(message);
             byte[] body = Encoding.UTF8.GetBytes(json);
-            channel.BasicPublish(exchange, routingKey, body: body, basicProperties: ChannelProperties(channel));            
-        }
 
-        private void ConfigureChannel(IModel channel, string queue, string exchange, string routingKey)
-        {
-            channel.ExchangeDeclare(exchange, ExchangeType.Topic);
-            channel.QueueDeclare(queue, false, false, false, null);
-            channel.QueueBind(queue, exchange, routingKey, null);
-            channel.BasicQos(0, 1, false);
+            var properties = CreateChannelProperties(); // Use synchronous method
+            await channel.BasicPublishAsync(exchange: exchange, routingKey: routingKey, mandatory: true, basicProperties: properties, body: body);
         }
-
-        private IBasicProperties ChannelProperties(IModel channel)
+        catch (Exception ex)
         {
-            var properties = channel.CreateBasicProperties();
-            properties.AppId = _rabbitMQMessageBroker.AppID;
-            properties.ContentType = "application/json";
-            properties.DeliveryMode = 1;
-            properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            return properties;
-        }
-
-        public void Dispose()
-        {
-            if (_connection != null && _connection.IsOpen)
-                _connection.Close();
+            _logger.LogError(ex, "Failed to send message to RabbitMQ.");
+            throw;
         }
     }
-}
 
+    private async Task ConfigureChannelAsync(IChannel channel, string queue, string exchange, string routingKey)
+    {
+        await channel.ExchangeDeclareAsync(exchange, ExchangeType.Topic, durable: true);
+        await channel.QueueDeclareAsync(queue, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        await channel.QueueBindAsync(queue, exchange, routingKey, null);
+        await channel.BasicQosAsync(0, 1, false);
+    }
+
+    private BasicProperties CreateChannelProperties()
+    {
+        var properties = new BasicProperties(); //channel.CreateBasicProperties();
+        properties.Persistent = true;
+        properties.AppId = _rabbitMQMessageBroker.AppID;
+        properties.ContentType = "application/json";
+        properties.DeliveryMode = (DeliveryModes)2; // Persistent
+        properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        return properties;
+    }
+
+   
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_connection != null && _connection.IsOpen)
+        {
+            await _connection.CloseAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        DisposeAsync().GetAwaiter().GetResult();
+    }
+}

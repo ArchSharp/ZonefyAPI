@@ -1,12 +1,13 @@
+using Asp.Versioning.ApiExplorer;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Domain.Entities.Configurations;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using ZonefyDotnet.DI;
 using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Middlewares;
 using ZonefyDotnet.Services.HostedService;
+using ZonefyDotnet.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,7 @@ builder.Services.ConfigureMvc();//register automapper
 builder.Services.ConfigureRateLimiting();
 builder.Services.ConfigureGoogleDriveService();
 builder.Services.ConfigureRedisServer(builder.Configuration);
+builder.Services.AddSingleton<S3Service>();
 
 
 

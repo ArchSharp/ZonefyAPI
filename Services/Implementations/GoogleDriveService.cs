@@ -25,33 +25,13 @@ namespace ZonefyDotnet.Services.Implementations
             _propertyRepository = propertyRepository;
         }
 
-        public async Task<SuccessResponse<string>> DeleteFileAsync(string fileId, string userEmail, Guid propertyId)
+        public async Task<string> DeleteFileAsync(string fileId)
         {
-            var findUser = await _userRepository.FirstOrDefault(x=> x.Email == userEmail);
-
-            if (findUser == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
-
-            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == propertyId);
-
-            if (findProperty == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
-
-            try
+           try
             {
                 await _driveService.Files.Delete(fileId).ExecuteAsync();
-                
-                findProperty.PropertyImageUrl.Remove(fileId);
-                await _propertyRepository.SaveChangesAsync();
-                
 
-                return new SuccessResponse<string>
-                {
-                    Data = $"File with ID {fileId} has been deleted.",
-                    Code = 200,
-                    Message = ResponseMessages.ImageDeleted,
-                    ExtraInfo = "File deleted successfully."
-                };
+                return $"File with ID {fileId} has been deleted.";
             }
             catch (Exception ex)
             {
@@ -91,7 +71,7 @@ namespace ZonefyDotnet.Services.Implementations
             }
         }
 
-        public async Task<SuccessResponse<List<string>>> UploadFileAsync(List<IFormFile> files, Guid propertyId)
+        public async Task<List<string>> UploadFileAsync(List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
             {
@@ -99,11 +79,6 @@ namespace ZonefyDotnet.Services.Implementations
             }
 
             var uploadedFileIds = new List<string>();
-
-            var findProperty = await _propertyRepository.FirstOrDefault(x=> x.Id == propertyId);
-
-            if(findProperty == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
             try
             {
@@ -142,27 +117,12 @@ namespace ZonefyDotnet.Services.Implementations
                     }
                 }
 
-                if (uploadedFileIds != null && uploadedFileIds.Count > 0)
-                {
-                    findProperty.PropertyImageUrl ??= new List<string>();
-                    findProperty.PropertyImageUrl.AddRange(uploadedFileIds);
-                    await _propertyRepository.SaveChangesAsync();
-                }
-
-                return new SuccessResponse<List<string>>
-                {
-                    Data = uploadedFileIds,
-                    Code = 200,
-                    Message = ResponseMessages.ImageUploaded,
-                    ExtraInfo = "All files uploaded successfully."
-                };
+                return  uploadedFileIds;
             }
             catch (Exception ex)
             {
                 throw new RestException(HttpStatusCode.InternalServerError, $"Internal server error: {ex.Message}");
             }
         }
-
-
     }
 }

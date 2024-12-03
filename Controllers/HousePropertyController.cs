@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.IO;
 using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Services.Implementations;
@@ -226,7 +228,7 @@ namespace ZonefyDotnet.Controllers
         public async Task<IActionResult> UploadImage(List<IFormFile> files, Guid propertyId)
         {
 
-            var response = await _googleDriveService.UploadFileAsync(files, propertyId);
+            var response = await _propertyService.UploadPropertyImages(files, propertyId);
 
             return Ok(response);
         }
@@ -245,9 +247,28 @@ namespace ZonefyDotnet.Controllers
         public async Task<IActionResult> DeleteFileAsync(string fileId, string userEmail, Guid propertyId)
         {
 
-            var response = await _googleDriveService.DeleteFileAsync(fileId, userEmail, propertyId);
+            var response = await _propertyService.DeletePropertyImageAsync(fileId, userEmail, propertyId);
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to upload property images
+        /// </summary>
+        /// <param name="propertyId"></param>
+        /// <param name="fileId"></param>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("DownloadImage")]
+        [Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<string>), 200)]
+        public async Task<IActionResult> DownloadImage(string fileId, string userEmail, Guid propertyId)
+        {
+
+            var fileStream = await _propertyService.DownloadPropertyImageAsync(fileId, userEmail, propertyId);
+
+            return File(fileStream, "application/octet-stream", fileId);
         }
 
         private string GetMimeType(byte[] fileBytes)

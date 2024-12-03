@@ -9,7 +9,7 @@ namespace ZonefyDotnet.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [ApiVersion("1.0")]
+    //[ApiVersion("1.0")]
     [Route("api/User")]
     public class UserController : ControllerBase
     {

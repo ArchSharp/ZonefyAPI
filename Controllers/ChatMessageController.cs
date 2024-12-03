@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZonefyDotnet.DTOs;
 using ZonefyDotnet.Helpers;
@@ -7,8 +8,8 @@ using ZonefyDotnet.Services.Interfaces;
 
 namespace ZonefyDotnet.Controllers
 {
-    [ApiController]
     [ApiVersion("1.0")]
+    [ApiController]
     [Route("api/ChatMessage")]
     [Authorize]
     public class ChatMessageController : ControllerBase

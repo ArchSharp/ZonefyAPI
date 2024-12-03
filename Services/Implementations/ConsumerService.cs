@@ -10,15 +10,13 @@ using ZonefyDotnet.DTOs;
 
 namespace ZonefyDotnet.Services.Implementations
 {
-    public class ConsumerService : IConsumerService
+    public class ConsumerService : IConsumerService, IDisposable
     {
         private readonly IEmailService _emailService;
         private readonly EmailSender _sender;
         private readonly RabbitMQMessageBroker _rabbitMQMessageBroker;
         private readonly IConnection _connection;
-        private readonly ILogger _logger;
-
-        private int failed = 0;
+        private readonly ILogger<ConsumerService> _logger;
 
         public ConsumerService(
             IEmailService emailService,
@@ -29,79 +27,88 @@ namespace ZonefyDotnet.Services.Implementations
         {
             _emailService = emailService;
             _rabbitMQMessageBroker = rabbitMQMessageBroker.Value;
-            _connection = rabbitMQConfig.CreateRabbitMQConnection(true);
+            _connection = rabbitMQConfig.CreateRabbitMQConnection();
             _logger = logger;
             _sender = sender.Value;
         }
 
-        public void RecieveMessage(string queue)
+        public async Task RecieveMessageAsync(string queue)
         {
-            var channel = _connection.CreateModel();
-            channel = ConfigureChannel(channel, queue);
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.Received += async (model, eventArgs) =>
+            try
             {
-                try
+                await using var channel = await _connection.CreateChannelAsync();
+
+                string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
+                string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;
+
+                await ConfigureChannelAsync(channel, queue, exchange, routingKey);
+
+                var consumer = new AsyncEventingBasicConsumer(channel);
+                consumer.ReceivedAsync += async (model, eventArgs) =>
                 {
-                    await Task.Run(() =>
+                    try
                     {
-                        //if (failed == 0)
-                        //{
-                        // _logger.LogInformation($"Retrying again {failed}");
                         var body = eventArgs.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-                        var verificationPayload = JsonConvert.DeserializeObject<Notification<EmailRequest>>(message);
-                        HandleMessage(verificationPayload);
-                        channel.BasicAck(eventArgs.DeliveryTag, false);
-                        _logger.LogInformation($"Message sent to: {verificationPayload.Data.ReceiverEmail}");
-                        //Solution is here
-                        //Console.WriteLine("Press Any Key to Continue..");
-                        //Console.ReadLine();
-                        //}
-                    });
-                }
-                catch (Exception ex)
-                {
-                    failed++;
-                    _logger.LogInformation($"Failed to process message: {ex.Message}");
+                        var notification = JsonConvert.DeserializeObject<Notification<EmailRequest>>(message);
 
-                    // Requeue the failed message
-                    channel.BasicNack(deliveryTag: eventArgs.DeliveryTag, multiple: false, requeue: true);
-                    _logger.LogInformation($"Message is back to the queue.");
-                }
-            };
-            channel.BasicConsume(queue, false, consumer);
+                        if (notification != null)
+                        {
+                            await HandleMessageAsync(notification);
+                            await channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                            _logger.LogInformation($"Processed message for: {notification.Data.ReceiverEmail}");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Received a null or invalid message.");
+                            await channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing message.");
+                        await channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                    }
+                };
+
+                await channel.BasicConsumeAsync(queue, autoAck: false, consumer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initializing the consumer.");
+                throw;
+            }
         }
 
-        private Task HandleMessage(Notification<EmailRequest> message)
+        private async Task HandleMessageAsync(Notification<EmailRequest> notification)
         {
-            string type = message.Type.ToLower();
+            string type = notification.Type.ToLower();
             switch (type)
             {
                 case "email":
-                    _emailService.SendEmailUsingMailKit(message.Data);
+                    _emailService.SendEmailUsingMailKit(notification.Data);
                     break;
                 default:
+                    _logger.LogWarning($"Unknown message type: {type}");
                     break;
             }
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        private IModel ConfigureChannel(IModel channel, string queue)
+        private async Task ConfigureChannelAsync(IChannel channel, string queue, string exchange, string routingKey)
         {
-            string routingKey = _rabbitMQMessageBroker.QueueIdentityRoutingKey;
-            string exchange = _rabbitMQMessageBroker.QueueIdentityExchange;
-            channel.ExchangeDeclare(exchange, ExchangeType.Topic);
-            channel.QueueDeclare(queue, false, false, false, null);
-            channel.QueueBind(queue, exchange, routingKey, null);
-            channel.BasicQos(0, 1, false);
-            return channel;
+            await channel.ExchangeDeclareAsync(exchange, ExchangeType.Topic, durable: true);
+            await channel.QueueDeclareAsync(queue, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            await channel.QueueBindAsync(queue, exchange, routingKey, null);
+            await channel.BasicQosAsync(0, 1, false);
         }
 
         public void Dispose()
         {
             if (_connection.IsOpen)
-                _connection.Close();
+            {
+                _connection.CloseAsync().GetAwaiter().GetResult();
+            }
         }
     }
 }

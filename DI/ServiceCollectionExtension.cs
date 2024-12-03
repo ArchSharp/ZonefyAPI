@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +16,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ZonefyDotnet.Configurations;
 using ZonefyDotnet.Common;
 using Google.Apis.Drive.v3;
+//using Asp.Versioning;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+//using Microsoft.Extensions.Options;
+//using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ZonefyDotnet.DI
 {
@@ -174,12 +178,17 @@ namespace ZonefyDotnet.DI
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 opt.ReportApiVersions = true;
+            }).AddApiExplorer(options => {
+                options.GroupNameFormat = "json";
+                options.SubstituteApiVersionInUrl = true;
             });
-            services.AddVersionedApiExplorer(opt =>
-            {
-                opt.GroupNameFormat = "'v'VVV";
-                opt.SubstituteApiVersionInUrl = true;
-            });
+
+            //services.AddVersionedApiExplorer(opt =>
+            //{
+            //    opt.GroupNameFormat = "'v'VVV";
+            //    opt.SubstituteApiVersionInUrl = true;
+            //});
+
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddMvcCore().AddApiExplorer();
         }

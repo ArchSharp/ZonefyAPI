@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Google.Apis.Drive.v3;
+using Google.Apis.Upload;
 using System.Net;
 using ZonefyDotnet.Common;
 using ZonefyDotnet.DTOs;
@@ -15,20 +16,20 @@ namespace ZonefyDotnet.Services.Implementations
 {
     public class HousePropertyService : IHousePropertyService
     {
-        private readonly DriveService _driveService;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<HouseProperty> _propertyRepository;
         private readonly IRepository<PropertyStatistics> _propertyStatisticsRepository;
         private readonly IMapper _mapper;
+        private readonly IS3Service _s3Service;
 
         public HousePropertyService(
-            DriveService driveService,
+            IS3Service s3Service,
             IRepository<User> userRepository,
             IRepository<HouseProperty> propertyRepository,
             IRepository<PropertyStatistics> propertyStatisticsRepository,
             IMapper mapper)
         {
-            _driveService = driveService;
+            _s3Service = s3Service;
             _userRepository = userRepository;
             _propertyRepository = propertyRepository;
             _propertyStatisticsRepository = propertyStatisticsRepository;
@@ -74,7 +75,7 @@ namespace ZonefyDotnet.Services.Implementations
                 {
                     try
                     {
-                        await _driveService.Files.Delete(fileId).ExecuteAsync();
+                        await _s3Service.DeleteFileAsync(fileId);
                     }
                     catch (Exception ex)
                     {
@@ -97,6 +98,48 @@ namespace ZonefyDotnet.Services.Implementations
                 ExtraInfo = "",
             };
             
+        }
+
+        public async Task<SuccessResponse<string>> DeletePropertyImageAsync(string fileId, string userEmail, Guid propertyId)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.Email == userEmail);
+
+            if (findUser == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
+            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == propertyId);
+
+            if (findProperty == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+
+
+                await _s3Service.DeleteFileAsync(fileId);
+
+                findProperty.PropertyImageUrl.Remove(fileId);
+                await _propertyRepository.SaveChangesAsync();
+
+
+                return new SuccessResponse<string>
+                {
+                    Data = $"File with ID {fileId} has been deleted.",
+                    Code = 200,
+                    Message = ResponseMessages.ImageDeleted,
+                    ExtraInfo = "File deleted successfully."
+                };
+            
+        }
+
+        public async Task<Stream> DownloadPropertyImageAsync(string fileId, string userEmail, Guid propertyId)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.Email == userEmail);
+            if (findUser == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
+            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == propertyId);
+            if (findProperty == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+
+            return await _s3Service.DownloadFileAsync(fileId);
         }
 
         public async Task<SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>> GetAllHouseProperties(int pageNumber = 1)
@@ -264,6 +307,37 @@ namespace ZonefyDotnet.Services.Implementations
                 ExtraInfo = "",
 
             };
+        }
+
+        public async Task<SuccessResponse<List<string>>> UploadPropertyImages(List<IFormFile> files, Guid propertyId)
+        {
+            if (files == null || files.Count == 0)
+            {
+                throw new RestException(HttpStatusCode.BadRequest, "No files uploaded.");
+            }
+
+            
+            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == propertyId);
+
+            if (findProperty == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+
+            var uploadedImgs = await _s3Service.UploadFileAsync(files);
+
+            if (uploadedImgs != null && uploadedImgs.Count > 0)
+            {
+                findProperty.PropertyImageUrl ??= new List<string>();
+                findProperty.PropertyImageUrl.AddRange(uploadedImgs);
+                await _propertyRepository.SaveChangesAsync();
+            }
+
+            return new SuccessResponse<List<string>>
+            {
+                Data = uploadedImgs,
+                Code = 200,
+                Message = ResponseMessages.ImageUploaded,
+                ExtraInfo = "All files uploaded successfully."
+            };            
         }
     }
 }
