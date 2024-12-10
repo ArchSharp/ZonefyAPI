@@ -24,7 +24,7 @@
 
 
 # Use the official .NET SDK image to build the app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
 # Copy service account file from the build context
@@ -42,7 +42,7 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Use the .NET runtime image to run the app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
 # Copy the build output to the runtime container
