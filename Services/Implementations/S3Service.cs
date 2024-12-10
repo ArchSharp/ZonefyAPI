@@ -20,8 +20,10 @@ namespace ZonefyDotnet.Services.Implementations
             _bucketName = awsOptions["S3BucketName"];
 
             _s3Client = new AmazonS3Client(
-                awsOptions["AccessKey"],
-                awsOptions["SecretKey"],
+                //awsOptions["AccessKey"],
+                "AKIA36ZQGXD5CFUN5DUC",
+                //awsOptions["SecretKey"],
+                "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",
                 Amazon.RegionEndpoint.GetBySystemName(awsOptions["Region"])
             );
         }
