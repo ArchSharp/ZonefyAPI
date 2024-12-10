@@ -17,7 +17,7 @@ namespace ZonefyDotnet.Services.Implementations
         public S3Service(IConfiguration configuration)
         {
             var awsOptions = configuration.GetSection("AWS");
-            _bucketName = "your-bucket-name";
+            _bucketName = awsOptions["S3BucketName"];
 
             _s3Client = new AmazonS3Client(
                 awsOptions["AccessKey"],

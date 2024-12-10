@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
-using Google.Apis.Drive.v3;
-using Google.Apis.Upload;
 using System.Net;
 using ZonefyDotnet.Common;
 using ZonefyDotnet.DTOs;
-//using ZonefyUser = ZonefyDotnet.Entities.User;
-//using ZonefyProp = ZonefyDotnet.Entities.HouseProperty;
-//using ZonefyPropStat = ZonefyDotnet.Entities.PropertyStatistics;
 using ZonefyDotnet.Entities;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Repositories.Interfaces;
@@ -70,7 +65,7 @@ namespace ZonefyDotnet.Services.Implementations
             if (findProperty == null)
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
-            if(findProperty.PropertyImageUrl?.Count() > 0){
+            if(findProperty.PropertyImageUrl?.Count() > 0) {
                 foreach (var fileId in findProperty.PropertyImageUrl)
                 {
                     try
@@ -113,20 +108,19 @@ namespace ZonefyDotnet.Services.Implementations
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
 
-                await _s3Service.DeleteFileAsync(fileId);
+            await _s3Service.DeleteFileAsync(fileId);
 
-                findProperty.PropertyImageUrl.Remove(fileId);
-                await _propertyRepository.SaveChangesAsync();
+            findProperty.PropertyImageUrl.Remove(fileId);
+            await _propertyRepository.SaveChangesAsync();
 
 
-                return new SuccessResponse<string>
-                {
-                    Data = $"File with ID {fileId} has been deleted.",
-                    Code = 200,
-                    Message = ResponseMessages.ImageDeleted,
-                    ExtraInfo = "File deleted successfully."
-                };
-            
+            return new SuccessResponse<string>
+            {
+                Data = $"File with ID {fileId} has been deleted.",
+                Code = 200,
+                Message = ResponseMessages.ImageDeleted,
+                ExtraInfo = "File deleted successfully."
+            };            
         }
 
         public async Task<Stream> DownloadPropertyImageAsync(string fileId, string userEmail, Guid propertyId)
