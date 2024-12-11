@@ -25,6 +25,11 @@ public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
     {
         try
         {
+            if (!_connection.IsOpen)
+            {
+                _logger.LogError("RabbitMQ connection is not open.");
+                throw new InvalidOperationException("RabbitMQ connection is closed.");
+            }
             await using var channel = await _connection.CreateChannelAsync();
             string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
             string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;

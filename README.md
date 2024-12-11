@@ -90,7 +90,7 @@ Installation Steps:
 		
 		- bind 0.0.0.0
 
-	To secure remote connections: Enable a password by adding or uncommenting:
+	To secure remote connections: Enable a password by adding or uncommenting: preese ctrl+W to search within the file
 		
 		- requirepass YourStrongPassword
 
