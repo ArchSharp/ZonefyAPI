@@ -24,7 +24,7 @@ namespace ZonefyDotnet.Services.HostedService
         {
             stoppingToken.ThrowIfCancellationRequested();
             _logger.LogInformation("Background service starting...");
-            _consumerService.RecieveMessageAsync(_rabbitMQMessageBroker.QueueNotification);
+            _consumerService.RecieveMessage(_rabbitMQMessageBroker.QueueNotification);
             return Task.CompletedTask;
         }
 

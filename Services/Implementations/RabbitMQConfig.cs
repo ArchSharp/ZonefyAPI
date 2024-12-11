@@ -22,7 +22,7 @@ namespace Application.Services.MessageBrokerConfig
             _rabbitMQMessageBroker = rabbitMQMessageBroker.Value;
         }
 
-        public IConnection CreateRabbitMQConnection()
+        public IConnection CreateRabbitMQConnection(bool async)
         {
             _logger.LogInformation("Connecting to RabbitMQ");
             ConnectionFactory factory = new()
@@ -32,12 +32,10 @@ namespace Application.Services.MessageBrokerConfig
                 UserName = _rabbitMQMessageBroker.RabbitMQUsername,
                 Port = int.Parse(_rabbitMQMessageBroker.RabbitMQPort),
                 VirtualHost = _rabbitMQMessageBroker.RabbitMQVirtual,
-                AutomaticRecoveryEnabled = true,                
-                //DispatchConsumersAsync = async,
-                RequestedHeartbeat = TimeSpan.FromSeconds(30),
-
+                AutomaticRecoveryEnabled = true,
+                DispatchConsumersAsync = async,
             };
-            return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            return factory.CreateConnection();
         }
     }
 }

@@ -4,6 +4,6 @@ namespace ZonefyDotnet.Services.Interfaces
 {
     public interface IConsumerService : IAutoDependencyService, IDisposable
     {
-        Task RecieveMessageAsync(string queue);
+        public void RecieveMessage(string queue);
     }
 }

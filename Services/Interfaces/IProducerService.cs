@@ -4,6 +4,6 @@ namespace ZonefyDotnet.Services.Interfaces
 {
     public interface IProducerService : IAutoDependencyService
     {
-        Task SendMessage<T>(T message, string queue);
+        void SendMessage<T>(T message, string queue);
     }
 }

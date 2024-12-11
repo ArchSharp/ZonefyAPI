@@ -5,6 +5,6 @@ namespace ZonefyDotnet.Services.Interfaces
 {
     public interface IRabbitMQConfig : IAutoDependencyService
     {
-        IConnection CreateRabbitMQConnection();
+        IConnection CreateRabbitMQConnection(bool async);
     }
 }
