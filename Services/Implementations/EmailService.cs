@@ -99,7 +99,7 @@ namespace ZonefyDotnet.Services.Implementations
 
         private string LoadTemplate(string emailTemplate)
         {
-            //string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDir = Directory.GetCurrentDirectory();// AppDomain.CurrentDomain.BaseDirectory;
             //string upThreeLevels = Path.Combine(baseDir, "..\\..\\..\\..\\");
 
             //string templateDir = Path.Combine(upThreeLevels, "Files/MailTemplates");
@@ -109,8 +109,9 @@ namespace ZonefyDotnet.Services.Implementations
             //using StreamReader streamReader = new StreamReader(fileStream, Encoding.Default);
 
             // Access the template directly from the /app/Files path
-            string templateDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files/MailTemplates");
+            string templateDir = Path.Combine(baseDir, "Files", "MailTemplates");
             string templatePath = Path.Combine(templateDir, $"{emailTemplate}.html");
+            Console.WriteLine($"email template path: {templatePath}");
 
             using FileStream fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using StreamReader streamReader = new StreamReader(fileStream, Encoding.Default);
@@ -129,7 +130,7 @@ namespace ZonefyDotnet.Services.Implementations
             //string templateDir = Path.Combine(upThreeLevels, "Files\\Images");
             //string filePath = Path.Combine(templateDir, $"{imageName}.{extension}");
 
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDir = Directory.GetCurrentDirectory(); //AppDomain.CurrentDomain.BaseDirectory;
             string templateDir = Path.Combine(baseDir, "Files", "Images"); // No need for upThreeLevels in Docker
             string filePath = Path.Combine(templateDir, $"{imageName}.{extension}");
 

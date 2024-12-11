@@ -10,7 +10,7 @@ using ZonefyDotnet.DTOs;
 
 namespace ZonefyDotnet.Services.Implementations
 {
-    public class ConsumerService : IConsumerService, IDisposable
+    public class ConsumerService : IConsumerService
     {
         private readonly IEmailService _emailService;
         private readonly EmailSender _sender;
@@ -36,7 +36,7 @@ namespace ZonefyDotnet.Services.Implementations
         {
             try
             {
-                await using var channel = await _connection.CreateChannelAsync();
+                var channel = await _connection.CreateChannelAsync();
 
                 string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
                 string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;

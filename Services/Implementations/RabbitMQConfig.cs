@@ -34,6 +34,8 @@ namespace Application.Services.MessageBrokerConfig
                 VirtualHost = _rabbitMQMessageBroker.RabbitMQVirtual,
                 AutomaticRecoveryEnabled = true,                
                 //DispatchConsumersAsync = async,
+                RequestedHeartbeat = TimeSpan.FromSeconds(30),
+
             };
             return factory.CreateConnectionAsync().GetAwaiter().GetResult();
         }

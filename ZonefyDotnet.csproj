@@ -6,13 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<DocumentationFile>bin\Debug\net8.0\ZonefyDotnet.xml</DocumentationFile>
+	<DocumentationFile>bin\Debug\net9.0\ZonefyDotnet.xml</DocumentationFile>
 
 	<NoWarn>CS1591</NoWarn>
 	<NoWarn>CS8618</NoWarn>
 	<UserSecretsId>9d90fb43-c055-4934-b53b-137b76b994df</UserSecretsId>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />

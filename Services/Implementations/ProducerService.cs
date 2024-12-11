@@ -5,7 +5,7 @@ using System.Text;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Services.Interfaces;
 
-public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
+public class ProducerService : IProducerService, IDisposable //IAsyncDisposable
 {
     private readonly ILogger _logger;
     private readonly IConnection _connection;
@@ -21,25 +21,70 @@ public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
         _rabbitMQMessageBroker = rabbitMQMessageBroker.Value;
     }
 
+    //public async Task SendMessage<T>(T message, string queue)
+    //{
+    //    try
+    //    {
+    //        if (!_connection.IsOpen)
+    //        {
+    //            _logger.LogError("RabbitMQ connection is not open.");
+    //            throw new InvalidOperationException("RabbitMQ connection is closed.");
+    //        }
+    //        await using var channel = await _connection.CreateChannelAsync();
+    //        string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
+    //        string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;
+    //        await ConfigureChannelAsync(channel, queue, exchange, routingKey);
+
+    //        string json = JsonConvert.SerializeObject(message);
+    //        byte[] body = Encoding.UTF8.GetBytes(json);
+
+    //        var properties = CreateChannelProperties(); // Use synchronous method
+    //        await channel.BasicPublishAsync(exchange: exchange, routingKey: routingKey, mandatory: true, basicProperties: properties, body: body);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        _logger.LogError(ex, "Failed to send message to RabbitMQ.");
+    //        throw;
+    //    }
+    //}
     public async Task SendMessage<T>(T message, string queue)
     {
         try
         {
+            // Check if connection is open
             if (!_connection.IsOpen)
             {
                 _logger.LogError("RabbitMQ connection is not open.");
                 throw new InvalidOperationException("RabbitMQ connection is closed.");
             }
-            await using var channel = await _connection.CreateChannelAsync();
-            string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
-            string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;
-            await ConfigureChannelAsync(channel, queue, exchange, routingKey);
 
-            string json = JsonConvert.SerializeObject(message);
-            byte[] body = Encoding.UTF8.GetBytes(json);
+            // Create a channel
+            var channel = await _connection.CreateChannelAsync();
+            try
+            {
+                string exchange = _rabbitMQMessageBroker.QueueNotificationExchange;
+                string routingKey = _rabbitMQMessageBroker.QueueNotificationRoutingKey;
 
-            var properties = CreateChannelProperties(); // Use synchronous method
-            await channel.BasicPublishAsync(exchange: exchange, routingKey: routingKey, mandatory: true, basicProperties: properties, body: body);
+                await ConfigureChannelAsync(channel, queue, exchange, routingKey);
+
+                string json = JsonConvert.SerializeObject(message);
+                byte[] body = Encoding.UTF8.GetBytes(json);
+
+                var properties = CreateChannelProperties();
+                await channel.BasicPublishAsync(exchange: exchange, routingKey: routingKey, mandatory: true, basicProperties: properties, body: body);
+            }
+            finally
+            {
+                // Explicitly close the channel
+                if (channel != null)
+                {
+                    //await channel.CloseAsync();
+                    if (_connection != null && _connection.IsOpen)
+                    {
+                        //await _connection.CloseAsync();
+                    }
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -47,6 +92,7 @@ public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
             throw;
         }
     }
+
 
     private async Task ConfigureChannelAsync(IChannel channel, string queue, string exchange, string routingKey)
     {
@@ -67,18 +113,26 @@ public class ProducerService : IProducerService, IAsyncDisposable, IDisposable
         return properties;
     }
 
-   
 
-    public async ValueTask DisposeAsync()
-    {
-        if (_connection != null && _connection.IsOpen)
-        {
-            await _connection.CloseAsync();
-        }
-    }
+
+    //public async ValueTask DisposeAsync()
+    //{
+    //    if (_connection != null && _connection.IsOpen)
+    //    {
+    //        //await _connection.CloseAsync();
+    //    }
+    //}
+
+    //public void Dispose()
+    //{
+    //    //DisposeAsync().GetAwaiter().GetResult();
+    //}
 
     public void Dispose()
     {
-        DisposeAsync().GetAwaiter().GetResult();
+        if (_connection != null && _connection.IsOpen)
+        {
+            _connection.CloseAsync().GetAwaiter().GetResult();
+        }
     }
 }
