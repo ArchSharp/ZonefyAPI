@@ -62,6 +62,12 @@ jobs:
     - name: Delete old container
       run: docker rm -f zonefy-container
     - name: Run docker container
-      run: docker run -d -p 5018:8080 --name zonefy-container archraphr/zonefyapi
+      run: |
+          docker run -d \
+          -p 5018:8080 \
+          --name zonefy-container \
+          -e AWS__S3SECRETKEY="${{ secrets.S3SECRETKEY }}" \
+          -e AWS__S3ACCESSKEY="${{ secrets.S3ACCESSKEY }}" \
+          archraphr/zonefyapi
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
