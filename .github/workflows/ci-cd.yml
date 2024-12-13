@@ -66,8 +66,8 @@ jobs:
           docker run -d \
           -p 5018:8080 \
           --name zonefy-container \
-          -e AWS__S3SECRETKEY="${{ secrets.S3SECRETKEY }}" \
-          -e AWS__S3ACCESSKEY="${{ secrets.S3ACCESSKEY }}" \
+          -e AWS__SecretKey="${{ secrets.S3SECRETKEY }}" \
+          -e AWS__AccessKey="${{ secrets.S3ACCESSKEY }}" \
           archraphr/zonefyapi
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
