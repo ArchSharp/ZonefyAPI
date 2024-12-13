@@ -1,9 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net;
-using ZonefyDotnet.Common;
 using ZonefyDotnet.Helpers;
 using ZonefyDotnet.Services.Interfaces;
 
