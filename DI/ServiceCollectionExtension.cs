@@ -266,9 +266,9 @@ namespace ZonefyDotnet.DI
         public static void ConfigureRedisServer(this IServiceCollection services, IConfiguration configuration)
         {
             var constring = configuration.GetValue<string>("Redis:ConnectionString");
-            Console.WriteLine("redis con string di: " + constring);
-            var awsSecret = configuration.GetValue<string>("AWS:SecretKey");
-            Console.WriteLine("checking aws credentials: " + awsSecret);
+            //Console.WriteLine("redis con string di: " + constring);
+            //var awsSecret = configuration.GetValue<string>("AWS:SecretKey");
+            //Console.WriteLine("checking aws credentials: " + awsSecret);
             services.AddSingleton(opt =>
             {
                 return new RedisService(constring);
