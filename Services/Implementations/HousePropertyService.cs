@@ -316,7 +316,23 @@ namespace ZonefyDotnet.Services.Implementations
             if (findProperty == null)
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
-            var uploadedImgs = await _s3Service.UploadFileAsync(files);
+            List<IFormFile> filteredFiles = new List<IFormFile>();
+            for (int i = 0; i < files.Count; i++)
+            {
+                IFormFile file = files[i];
+                // Extract file names from URLs in PropertyImageUrl and compare
+                if (!findProperty.PropertyImageUrl.Any(url => Path.GetFileName(url) == file.FileName))
+                {
+                    filteredFiles.Add(file);
+                }
+            }
+
+            if (filteredFiles == null || filteredFiles.Count == 0)
+            {
+                throw new RestException(HttpStatusCode.BadRequest, "Selected files are already uploaded.");
+            }
+
+            var uploadedImgs = await _s3Service.UploadFileAsync(filteredFiles);
 
             if (uploadedImgs != null && uploadedImgs.Count > 0)
             {
