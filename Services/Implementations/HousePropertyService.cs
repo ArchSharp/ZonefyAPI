@@ -110,7 +110,7 @@ namespace ZonefyDotnet.Services.Implementations
 
             await _s3Service.DeleteFileAsync(fileId);
 
-            findProperty.PropertyImageUrl.Remove(fileId);
+            findProperty.PropertyImageUrl.Remove($"https://zonefys3bucket.s3.amazonaws.com/{fileId}");
             await _propertyRepository.SaveChangesAsync();
 
 
