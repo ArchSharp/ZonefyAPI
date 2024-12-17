@@ -321,7 +321,7 @@ namespace ZonefyDotnet.Services.Implementations
             {
                 IFormFile file = files[i];
                 // Extract file names from URLs in PropertyImageUrl and compare
-                if (!findProperty.PropertyImageUrl.Any(url => Path.GetFileName(url) == file.FileName))
+                if (findProperty.PropertyImageUrl == null || !findProperty.PropertyImageUrl.Any(url => Path.GetFileName(url) == file.FileName))
                 {
                     filteredFiles.Add(file);
                 }
