@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Net;
 using ZonefyDotnet.Common;
 using ZonefyDotnet.DTOs;
@@ -214,6 +215,30 @@ namespace ZonefyDotnet.Services.Implementations
                 Data = "Message sent",
                 Code = 201,
                 Message = ResponseMessages.MessageSent,
+                ExtraInfo = "",
+            };
+        }
+
+        public async Task<SuccessResponse<string>> UpdateChatMessageReadStatus(Guid messageId, Guid userId)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.Id == userId);
+
+            if (findUser == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.SenderNotFound);
+
+            var getMessage = await _chatMessageRepository.FirstOrDefault(x=> x.Id == messageId);
+
+            if (getMessage == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.MessageNotFound);
+
+            getMessage.IsRead = true;
+            await _chatMessageRepository.SaveChangesAsync();
+
+            return new SuccessResponse<string>
+            {
+                Data = "Message updated",
+                Code = 201,
+                Message = ResponseMessages.MessageRead,
                 ExtraInfo = "",
             };
         }

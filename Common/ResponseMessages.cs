@@ -22,6 +22,7 @@ namespace ZonefyDotnet.Common
         public const string InvalidToken = "Invalid token";
         public const string ExpiredToken = "Expired token";
         public const string TokenNotFound = "Token not found";
+        public const string MessageNotFound = "Message not found";
         public const string TooManyRequest = "Too many request, please try again in next three minutes";
         public const string RenewedToken = "Token is now renewed";
         public const string PasswordChangedSuccessful = "Password has been changed successfully";
@@ -41,5 +42,6 @@ namespace ZonefyDotnet.Common
         public const string MessageSent = "Message has been sent";
         public const string ChatMessageNotFound = "Chat messages not found";
         public const string ChatMessageDeleted = "Chat message deleted";
+        public const string MessageRead = "Message has been updated";
     }
 }

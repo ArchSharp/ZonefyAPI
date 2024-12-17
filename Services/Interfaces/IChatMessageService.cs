@@ -11,5 +11,6 @@ namespace ZonefyDotnet.Services.Interfaces
         Task<SuccessResponse<PaginatedResponse<GetChatMessagesDTO>>> GetPropertyUserMessages(string sender, string receiver, Guid propertyId, int pageNumber);
         Task<SuccessResponse<string>> DeleteChatMessages(string chatIdentifier);
         Task<SuccessResponse<string>> DeleteSingleChatMessage(Guid messageId);
+        Task<SuccessResponse<string>> UpdateChatMessageReadStatus(Guid messageId, Guid userId);
     }
 }

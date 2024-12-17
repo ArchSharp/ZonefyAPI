@@ -43,7 +43,7 @@ namespace ZonefyDotnet.Services.Implementations
                 audience: _jwtParameters.Audience,
                 claims: claims,
                 null,
-                expires: DateTime.UtcNow.AddMinutes(10),//.AddDays(2),//.AddHours(2),
+                expires: DateTime.UtcNow.AddDays(2),//.AddDays(2),//.AddHours(2),
                 signingCredentials: signingCredentials);
 
             string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);

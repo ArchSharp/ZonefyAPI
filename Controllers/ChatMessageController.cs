@@ -60,6 +60,23 @@ namespace ZonefyDotnet.Controllers
         }
 
         /// <summary>
+        /// Endpoint to update chat message read status
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("UpdateChatMessageReadStatus")]
+        [ProducesResponseType(typeof(SuccessResponse<string>), 201)]
+        public async Task<IActionResult> UpdateChatMessageReadStatus(Guid messageId, Guid userId)
+        {
+
+            var response = await _chatMessageService.UpdateChatMessageReadStatus(messageId, userId);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Endpoint to get all chat messages
         /// </summary>
         /// <param name="pageNumber"></param>
