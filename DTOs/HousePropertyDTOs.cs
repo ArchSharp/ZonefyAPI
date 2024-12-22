@@ -23,6 +23,8 @@ namespace ZonefyDotnet.DTOs
         //public List<string>?  PropertyImageUrl { get; set; }
         public string PropertyLocation { get; set; }
         [Required]
+        public int PostCode { get; set; }
+        [Required]
         public int ToiletNumber { get; set; }
         [Required]
         public int ParkingLot { get; set; }
@@ -48,10 +50,12 @@ namespace ZonefyDotnet.DTOs
         public string PropertyType { get; set; }
         public List<string> PropertyImageUrl { get; set; }
         public string PropertyLocation { get; set; }
+        public int PostCode { get; set; }
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
         public int Guests { get; set; }
         public double Dimension { get; set; }
+        public bool IsBlocked { get; set; }
         public DateTime CheckInTime { get; set; }
         public DateTime CheckOutTime { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -71,6 +75,8 @@ namespace ZonefyDotnet.DTOs
         public string PropertyType { get; set; }
         public List<string> PropertyImageUrl { get; set; }
         public string PropertyLocation { get; set; }
+        public int PostCode { get; set; }
+        public bool IsBlocked { get; set; }
         public int ToiletNumber { get; set; }
         public int ParkingLot { get; set; }
         public int Guests { get; set; }

@@ -89,6 +89,39 @@ namespace ZonefyDotnet.Controllers
         }
 
         /// <summary>
+        /// Endpoint to get user by phone or email
+        /// </summary>
+        /// <param name="phoneOrEmail"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("GetUserByPhoneOrEmail")]
+        [ProducesResponseType(typeof(SuccessResponse<GetUserDto>), 200)]
+        public async Task<IActionResult> GetUserByPhoneOrEmail(string phoneOrEmail)
+        {
+
+            var response = await _userService.GetUserByPhoneOrEmail(phoneOrEmail);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to get user by phone or email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="blockState"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("BlockingUser")]
+        [ProducesResponseType(typeof(SuccessResponse<GetUserDto>), 200)]
+        public async Task<IActionResult> BlockingUser(string email, bool blockState)
+        {
+
+            var response = await _userService.BlockingUser(email, blockState);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Endpoint to reset user password
         /// </summary>
         /// <param name="email"></param>

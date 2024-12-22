@@ -38,6 +38,11 @@ namespace ZonefyDotnet.Services.Implementations
             if (findUser == null)
                 throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
 
+            var findPropertyByName = await _propertyRepository.FirstOrDefault(x => x.PropertyName == model.PropertyName);
+
+            if (findPropertyByName != null)
+                throw new RestException(HttpStatusCode.BadRequest, ResponseMessages.PropertyNameExist);
+
             model.CheckInTime = DateTime.SpecifyKind(model.CheckInTime, DateTimeKind.Utc);
             model.CheckOutTime = DateTime.SpecifyKind(model.CheckOutTime, DateTimeKind.Utc);
 
@@ -167,7 +172,7 @@ namespace ZonefyDotnet.Services.Implementations
             };
         }
 
-        public async Task<SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>> GetAllHousePropertiesByEmail(string email, int pageNumber = 1)
+        public async Task<SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>> GetAllHousePropertiesByEmailOrPhone(string emailOrPhone, int pageNumber = 1)
         {
             int pageSize = 30;
             // Ensure pageNumber is at least 1
@@ -175,13 +180,13 @@ namespace ZonefyDotnet.Services.Implementations
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _propertyRepository.CountAsync(x => x.CreatorEmail == email);
+            int totalCount = await _propertyRepository.CountAsync(x => x.CreatorEmail == emailOrPhone || x.OwnerPhoneNumber == emailOrPhone);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allProperties = await _propertyRepository.FindPaginatedAsync(x => x.CreatorEmail == email, skip, pageSize, p => p.CreatedAt);
+            var allProperties = await _propertyRepository.FindPaginatedAsync(x => x.CreatorEmail == emailOrPhone || x.OwnerPhoneNumber == emailOrPhone, skip, pageSize, p => p.CreatedAt);
 
             // Map the properties to DTOs
             var propertiesResponse = _mapper.Map<IEnumerable<GetHousePropertyDTO>>(allProperties);
@@ -205,7 +210,7 @@ namespace ZonefyDotnet.Services.Implementations
             };
         }
 
-        public async Task<SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>> GetAllUserPropertyStatisticsByEmail(string email, int pageNumber)
+        public async Task<SuccessResponse<PaginatedResponse<GetPropertyStatisticDTO>>> GetAllUserPropertyStatisticsByEmail(string email, int pageNumber = 1)
         {
             int pageSize = 30;
             // Ensure pageNumber is at least 1
@@ -238,6 +243,23 @@ namespace ZonefyDotnet.Services.Implementations
                 Data = paginatedResponse,
                 Code = 200,
                 Message = ResponseMessages.FetchedSuccesss,
+                ExtraInfo = "",
+            };
+        }
+
+        public async Task<SuccessResponse<GetHousePropertyDTO>> GetHousePropertyByName(string name)
+        {
+            var findPropertyByName = await _propertyRepository.FirstOrDefault(x => x.PropertyName == name);
+            
+            var newPropertyResponse = _mapper.Map<GetHousePropertyDTO>(findPropertyByName);
+
+            string strResponse = findPropertyByName == null ? $"No property with {name} name" : ResponseMessages.FetchedSuccesss;
+
+            return new SuccessResponse<GetHousePropertyDTO>
+            {
+                Data = newPropertyResponse,
+                Code = 201,
+                Message = strResponse,
                 ExtraInfo = "",
             };
         }
@@ -348,6 +370,66 @@ namespace ZonefyDotnet.Services.Implementations
                 Message = ResponseMessages.ImageUploaded,
                 ExtraInfo = "All files uploaded successfully."
             };            
+        }
+
+        public async Task<SuccessResponse<GetHousePropertyDTO>> BlockingProperty(string email, Guid propId, bool blockState)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.Email == email) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
+            var property = await _propertyRepository.FirstOrDefault(X => X.Id == propId) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+            
+            property.IsBlocked = blockState;
+            await _propertyRepository.SaveChangesAsync();
+
+            var newPropResponse = _mapper.Map<GetHousePropertyDTO>(property);
+
+            return new SuccessResponse<GetHousePropertyDTO>
+            {
+                Data = newPropResponse,
+                Code = 201,
+                Message = ResponseMessages.BlockStatusChanged,
+                ExtraInfo = "",
+            };
+        }
+
+        public async Task<SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>> SearchAllHouseProperties(string locationOrPostCode, DateTime checkIn, DateTime checkOut, string propertyType, int pageNumber = 1)
+        {
+            int pageSize = 30;
+            // Ensure pageNumber is at least 1
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Retrieve the total count of properties for the given email for pagination metadata
+            int totalCount = await _propertyRepository.CountAsync(x => (x.PropertyLocation.Contains(locationOrPostCode, StringComparison.OrdinalIgnoreCase) || x.PostCode.ToString() == locationOrPostCode) &&
+                                                                        (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType);
+
+            int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+
+            // Fetch the paginated data
+            var allProperties = await _propertyRepository.FindPaginatedAsync(x => (x.PropertyLocation.Contains(locationOrPostCode, StringComparison.OrdinalIgnoreCase) || x.PostCode.ToString() == locationOrPostCode) &&
+                                                                                  (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType, skip, pageSize, p => p.CreatedAt);
+
+            // Map the properties to DTOs
+            var propertiesResponse = _mapper.Map<IEnumerable<GetHousePropertyDTO>>(allProperties);
+
+            // Wrap in paginated response
+            var paginatedResponse = new PaginatedResponse<GetHousePropertyDTO>
+            {
+                Data = propertiesResponse,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalRecords = totalCount
+            };
+
+            return new SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>
+            {
+                Data = paginatedResponse,
+                Code = 200,
+                Message = ResponseMessages.FetchedSuccesss,
+                ExtraInfo = ""
+            };
         }
     }
 }

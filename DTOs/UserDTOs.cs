@@ -18,6 +18,7 @@ namespace ZonefyDotnet.DTOs
         public required string PhoneNumber { get; set; }
         public bool IsEmailVerified { get; set; }
         public bool IsTwoFactorEnabled { get; set; }
+        public bool IsBlocked { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

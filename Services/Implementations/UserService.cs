@@ -16,6 +16,7 @@ namespace ZonefyDotnet.Services.Implementations
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<ForgotPassword> _forgotRepository;
         private readonly IRepository<RefreshToken> _refreshTokenRepository;
+        private readonly IRepository<HouseProperty> _propertyRepository;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
         private readonly ITwoFactorAuthService _twoFactorAuthService;
@@ -24,6 +25,7 @@ namespace ZonefyDotnet.Services.Implementations
         public UserService(
             IRepository<User> userRepository,
             IRepository<ForgotPassword> forgotRepository,
+            IRepository<HouseProperty> propertyRepository,
             IMapper mapper,
             IJwtService jwtService,
             IRepository<RefreshToken> refreshTokenRepository,
@@ -32,6 +34,7 @@ namespace ZonefyDotnet.Services.Implementations
         {
             _userRepository = userRepository;
             _forgotRepository = forgotRepository;
+            _propertyRepository = propertyRepository;
             _mapper = mapper;
             _jwtService = jwtService;
             _refreshTokenRepository = refreshTokenRepository;
@@ -44,6 +47,11 @@ namespace ZonefyDotnet.Services.Implementations
 
             if (findUser != null)
                 throw new RestException(HttpStatusCode.BadRequest, ResponseMessages.UserAlreadyExist);
+
+            var findUserPhone = await _userRepository.FirstOrDefault(x => x.PhoneNumber == model.PhoneNumber);
+
+            if(findUserPhone != null)
+                throw new RestException(HttpStatusCode.BadRequest, ResponseMessages.UserPhoneAlreadyExist);
 
             string hashPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
             model.Password = hashPassword;
@@ -377,6 +385,52 @@ namespace ZonefyDotnet.Services.Implementations
                 ExtraInfo = "",
             };
 
+        }
+
+        public async Task<SuccessResponse<GetUserDto>> GetUserByPhoneOrEmail(string phoneOrEmail)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.PhoneNumber == phoneOrEmail || x.Email == phoneOrEmail) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
+            var newUserResponse = _mapper.Map<GetUserDto>(findUser);
+
+            return new SuccessResponse<GetUserDto>
+            {
+                Data = newUserResponse,
+                Code = 200,
+                Message = ResponseMessages.FetchedSuccesss,
+                ExtraInfo = "",
+            };
+        }
+
+        public async Task<SuccessResponse<GetUserDto>> BlockingUser(string email, bool blockState)
+        {
+            var findUser = await _userRepository.FirstOrDefault(x => x.Email == email);
+
+            if (findUser == null)
+                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
+            var allProperties = await _propertyRepository.FindAsync(X => X.CreatorEmail == email);
+            if (allProperties != null){
+                for (int i = 0; i < allProperties.Count(); i++)
+                {
+                    var property = allProperties.ElementAt(i);
+                    property.IsBlocked = blockState;
+                    await _propertyRepository.SaveChangesAsync();
+                }
+            }
+
+            findUser.IsBlocked = blockState;
+            await _userRepository.SaveChangesAsync();
+
+            var newUserResponse = _mapper.Map<GetUserDto>(findUser);
+
+            return new SuccessResponse<GetUserDto>
+            {
+                Data = newUserResponse,
+                Code = 201,
+                Message = ResponseMessages.BlockStatusChanged,
+                ExtraInfo = "",
+            };
         }
     }
 }

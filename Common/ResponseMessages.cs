@@ -31,6 +31,8 @@ namespace ZonefyDotnet.Common
         public const string ReceiverNotFound = "Receiver not found";
         public const string InCorrectPassword = "Wrong password";
         public const string UserAlreadyExist = "User already exist";
+        public const string UserPhoneAlreadyExist = "User with phone number already exist";
+        public const string PropertyNameExist = "Property with this name already exist";
         public const string ForgotPasswordLinkSent = "Forgot password link has been sent to your email";
         public const string NewPropertyCreated = "Property created successfully";
         public const string FetchedSuccesss = " fetched successfully";
@@ -43,5 +45,6 @@ namespace ZonefyDotnet.Common
         public const string ChatMessageNotFound = "Chat messages not found";
         public const string ChatMessageDeleted = "Chat message deleted";
         public const string MessageRead = "Message has been updated";
+        public const string BlockStatusChanged = "Block status has been changed";
     }
 }

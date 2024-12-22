@@ -68,17 +68,74 @@ namespace ZonefyDotnet.Controllers
         /// <summary>
         /// Endpoint to get all properties by email
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="emailOrPhone"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         [HttpGet()]
         [Route("GetAllByEmail")]
         [Authorize]
         [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>), 200)]
-        public async Task<IActionResult> GetAllHousePropertiesByEmail(string email, int pageNumber)
+        public async Task<IActionResult> GetAllHousePropertiesByEmail(string emailOrPhone, int pageNumber)
         {
 
-            var response = await _propertyService.GetAllHousePropertiesByEmail(email, pageNumber);
+            var response = await _propertyService.GetAllHousePropertiesByEmailOrPhone(emailOrPhone, pageNumber);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to search all properties by location or postcode, check-in and check-out time, and property type
+        /// </summary>
+        /// <param name="locationOrPostCode"></param>
+        /// <param name="checkIn"></param>
+        /// <param name="checkOut"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("SearchAllHouseProperties")]
+        //[Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>), 200)]
+        public async Task<IActionResult> SearchAllHouseProperties(string locationOrPostCode, DateTime checkIn, DateTime checkOut, string propertyType, int pageNumber)
+        {
+
+            var response = await _propertyService.SearchAllHouseProperties(locationOrPostCode, checkIn, checkOut, propertyType, pageNumber);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to get property by name
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("GetHousePropertyByName")]
+        [Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<GetHousePropertyDTO>), 200)]
+        public async Task<IActionResult> GetHousePropertyByName(string propName)
+        {
+
+            var response = await _propertyService.GetHousePropertyByName(propName);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Endpoint to block or unblock property by name
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="propId"></param>
+        /// <param name="blockState"></param>
+        /// <returns></returns>
+        [HttpGet()]
+        [Route("BlockingProperty")]
+        [Authorize]
+        [ProducesResponseType(typeof(SuccessResponse<GetHousePropertyDTO>), 200)]
+        public async Task<IActionResult> BlockingProperty(string email, Guid propId, bool blockState)
+        {
+
+            var response = await _propertyService.BlockingProperty(email, propId, blockState);
 
             return Ok(response);
         }
