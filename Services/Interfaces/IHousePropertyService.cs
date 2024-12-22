@@ -18,6 +18,6 @@ namespace ZonefyDotnet.Services.Interfaces
         Task<SuccessResponse<List<string>>> UploadPropertyImages(List<IFormFile> files, Guid propertyId);
         Task<SuccessResponse<string>> DeletePropertyImageAsync(string fileId, string userEmail, Guid propertyId);
         Task<Stream> DownloadPropertyImageAsync(string fileId, string userEmail, Guid propertyId);
-        Task<SuccessResponse<GetHousePropertyDTO>> BlockingProperty(string email, Guid propId, bool blockState)
+        Task<SuccessResponse<GetHousePropertyDTO>> BlockingProperty(string email, Guid propId, bool blockState);
     }
 }
