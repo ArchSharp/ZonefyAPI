@@ -399,7 +399,16 @@ namespace ZonefyDotnet.Services.Implementations
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int post_code = int.Parse(locationOrPostCode);
+            int post_code = 0;
+            if (int.TryParse(locationOrPostCode, out int number))
+            {
+                Console.WriteLine($"Converted number: {number}");
+                post_code = number;
+            }
+            else
+            {
+                Console.WriteLine("Invalid number format.");
+            }
             int totalCount = await _propertyRepository.CountAsync(x => (x.PropertyLocation.ToLower().Contains(locationOrPostCode) || x.PostCode == post_code) &&
                                                                         (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType);
 
