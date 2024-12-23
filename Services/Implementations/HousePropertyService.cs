@@ -409,20 +409,20 @@ namespace ZonefyDotnet.Services.Implementations
             {
                 Console.WriteLine("Invalid number format.");
             }
-            //var checkin = DateTime.SpecifyKind(checkIn, DateTimeKind.Utc);
-            //var checkout = DateTime.SpecifyKind(checkOut, DateTimeKind.Utc);
-            var checkin = checkIn.ToUniversalTime();
-            var checkout = checkOut.ToUniversalTime();
+            var checkin = DateTime.SpecifyKind(checkIn, DateTimeKind.Utc);
+            var checkout = DateTime.SpecifyKind(checkOut, DateTimeKind.Utc);
+            //var checkin = checkIn.ToUniversalTime();
+            //var checkout = checkOut.ToUniversalTime();
 
             int totalCount = await _propertyRepository.CountAsync(x => (x.PropertyLocation.ToLower().Contains(locationOrPostCode) || x.PostCode == post_code) &&
-                                                                        (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType);
+                                                                        (checkin >= x.CheckInTime && checkout <= x.CheckOutTime) && x.PropertyType == propertyType);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
             var allProperties = await _propertyRepository.FindPaginatedAsync(x => (x.PropertyLocation.ToLower().Contains(locationOrPostCode) || x.PostCode == post_code) &&
-                                                                                  (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType, skip, pageSize, p => p.CreatedAt);
+                                                                                  (checkin >= x.CheckInTime && checkout <= x.CheckOutTime) && x.PropertyType == propertyType, skip, pageSize, p => p.CreatedAt);
 
             // Map the properties to DTOs
             var propertiesResponse = _mapper.Map<IEnumerable<GetHousePropertyDTO>>(allProperties);
