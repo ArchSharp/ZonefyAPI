@@ -33,10 +33,7 @@ namespace ZonefyDotnet.Services.Implementations
 
         public async Task<SuccessResponse<GetHousePropertyDTO>> CreateHouseProperty(CreateHousePropertyDTO model)
         {
-            var findUser = await _userRepository.FirstOrDefault(x => x.Email == model.CreatorEmail);
-
-            if (findUser == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+            var findUser = await _userRepository.FirstOrDefault(x => x.Email == model.CreatorEmail) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
 
             var findPropertyByName = await _propertyRepository.FirstOrDefault(x => x.PropertyName == model.PropertyName);
 
@@ -174,19 +171,21 @@ namespace ZonefyDotnet.Services.Implementations
 
         public async Task<SuccessResponse<PaginatedResponse<GetHousePropertyDTO>>> GetAllHousePropertiesByEmailOrPhone(string emailOrPhone, int pageNumber = 1)
         {
+            var findUser = await _userRepository.FirstOrDefault(x => x.PhoneNumber == emailOrPhone || x.Email == emailOrPhone) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.UserNotFound);
+
             int pageSize = 30;
             // Ensure pageNumber is at least 1
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _propertyRepository.CountAsync(x => x.CreatorEmail == emailOrPhone || x.OwnerPhoneNumber == emailOrPhone);
+            int totalCount = await _propertyRepository.CountAsync(x => x.CreatorEmail == findUser.Email);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allProperties = await _propertyRepository.FindPaginatedAsync(x => x.CreatorEmail == emailOrPhone || x.OwnerPhoneNumber == emailOrPhone, skip, pageSize, p => p.CreatedAt);
+            var allProperties = await _propertyRepository.FindPaginatedAsync(x => x.CreatorEmail == findUser.Email, skip, pageSize, p => p.CreatedAt);
 
             // Map the properties to DTOs
             var propertiesResponse = _mapper.Map<IEnumerable<GetHousePropertyDTO>>(allProperties);
@@ -400,14 +399,15 @@ namespace ZonefyDotnet.Services.Implementations
             int skip = (pageNumber - 1) * pageSize;
 
             // Retrieve the total count of properties for the given email for pagination metadata
-            int totalCount = await _propertyRepository.CountAsync(x => (x.PropertyLocation.Contains(locationOrPostCode, StringComparison.OrdinalIgnoreCase) || x.PostCode.ToString() == locationOrPostCode) &&
+            int post_code = int.Parse(locationOrPostCode);
+            int totalCount = await _propertyRepository.CountAsync(x => (x.PropertyLocation.ToLower().Contains(locationOrPostCode) || x.PostCode == post_code) &&
                                                                         (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType);
 
             int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
 
             // Fetch the paginated data
-            var allProperties = await _propertyRepository.FindPaginatedAsync(x => (x.PropertyLocation.Contains(locationOrPostCode, StringComparison.OrdinalIgnoreCase) || x.PostCode.ToString() == locationOrPostCode) &&
+            var allProperties = await _propertyRepository.FindPaginatedAsync(x => (x.PropertyLocation.ToLower().Contains(locationOrPostCode) || x.PostCode == post_code) &&
                                                                                   (checkIn >= x.CheckInTime && checkOut <= x.CheckOutTime) && x.PropertyType == propertyType, skip, pageSize, p => p.CreatedAt);
 
             // Map the properties to DTOs
