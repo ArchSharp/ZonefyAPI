@@ -171,20 +171,14 @@ namespace ZonefyDotnet.Services.Implementations
 
         public async Task<SuccessResponse<string>> SendMessage(SendMessageRequestDTO request)
         {
-            var findUSender = await _userRepository.FirstOrDefault(x => x.Email == request.SenderEmail);
+            var findUSender = await _userRepository.FirstOrDefault(x => x.Email == request.SenderEmail) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.SenderNotFound);
 
-            if (findUSender == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.SenderNotFound);
-
-            var findReceiver = await _userRepository.FirstOrDefault(x => x.Email == request.ReceiverEmail);
-
-            if (findReceiver == null)
-                throw new RestException(HttpStatusCode.NotFound, ResponseMessages.ReceiverNotFound);
+            var findReceiver = await _userRepository.FirstOrDefault(x => x.Email == request.ReceiverEmail) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.ReceiverNotFound);
 
             if (findUSender.Email == findReceiver.Email)
                 throw new RestException(HttpStatusCode.BadRequest, "You cannot send message to yourself");
 
-            var findProperty = await _propertyRepository.FirstOrDefault(x=>x.Id== request.PropertyId);
+            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == request.PropertyId) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
             string interestedUserEmail = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
 
