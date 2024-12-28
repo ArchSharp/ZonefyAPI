@@ -178,31 +178,59 @@ namespace ZonefyDotnet.Services.Implementations
             if (findUSender.Email == findReceiver.Email)
                 throw new RestException(HttpStatusCode.BadRequest, "You cannot send message to yourself");
 
-            var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == request.PropertyId) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
+            if(request.PropertyId != Guid.Empty){
+                var findProperty = await _propertyRepository.FirstOrDefault(x => x.Id == request.PropertyId) ?? throw new RestException(HttpStatusCode.NotFound, ResponseMessages.PropertyNotFound);
 
-            string interestedUserEmail = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
+                string interestedUserEmail = findProperty.CreatorEmail == request.SenderEmail ? request.ReceiverEmail : request.SenderEmail;
 
-            var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserEmail);
-            if (findStatistics == null)
-            {
-                var newPayload = new PropertyStatistics
+                var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserEmail);
+                if (findStatistics == null)
                 {
-                    CreatorEmail = findProperty.CreatorEmail,
-                    PropertyName = findProperty.PropertyName,
-                    UserEmail = interestedUserEmail,
-                    PropertyId = request.PropertyId
-                };
-                await _propertyStatisticsRepository.AddAsync(newPayload);
-                await _propertyStatisticsRepository.SaveChangesAsync();
+                    var newPayload = new PropertyStatistics
+                    {
+                        CreatorEmail = findProperty.CreatorEmail,
+                        PropertyName = findProperty.PropertyName,
+                        UserEmail = interestedUserEmail,
+                        PropertyId = request.PropertyId
+                    };
+                    await _propertyStatisticsRepository.AddAsync(newPayload);
+                    await _propertyStatisticsRepository.SaveChangesAsync();
+                }
+
+                var newChat = _mapper.Map<ChatMessage>(request);
+                newChat.ChatIdentifier = request.SenderEmail.Trim() + request.ReceiverEmail.Trim();
+                newChat.SenderId = findUSender.Id;
+                newChat.ReceiverId = findReceiver.Id;
+
+                await _chatMessageRepository.AddAsync(newChat);
+                await _chatMessageRepository.SaveChangesAsync();
+
+            }else if (request.PropertyId == Guid.Empty)
+            {
+                string interestedUserEmail = findUSender.Email == "adeyemi.adenipekun@outlook.com" ? request.ReceiverEmail : request.SenderEmail;
+
+                var findStatistics = await _propertyStatisticsRepository.FirstOrDefault(x => x.PropertyId == request.PropertyId && x.UserEmail == interestedUserEmail);
+                if (findStatistics == null)
+                {
+                    var newPayload = new PropertyStatistics
+                    {
+                        CreatorEmail = "adeyemi.adenipekun@outlook.com",
+                        PropertyName = "Admin",
+                        UserEmail = interestedUserEmail,
+                        PropertyId = request.PropertyId
+                    };
+                    await _propertyStatisticsRepository.AddAsync(newPayload);
+                    await _propertyStatisticsRepository.SaveChangesAsync();
+                }
+
+                var newChat = _mapper.Map<ChatMessage>(request);
+                newChat.ChatIdentifier = request.SenderEmail.Trim() + request.ReceiverEmail.Trim();
+                newChat.SenderId = findUSender.Id;
+                newChat.ReceiverId = findReceiver.Id;
+
+                await _chatMessageRepository.AddAsync(newChat);
+                await _chatMessageRepository.SaveChangesAsync();
             }
-
-            var newChat = _mapper.Map<ChatMessage>(request);
-            newChat.ChatIdentifier = request.SenderEmail.Trim() + request.ReceiverEmail.Trim();
-            newChat.SenderId = findUSender.Id;
-            newChat.ReceiverId = findReceiver.Id;
-
-            await _chatMessageRepository.AddAsync(newChat);
-            await _chatMessageRepository.SaveChangesAsync();
 
             return new SuccessResponse<string>
             {
